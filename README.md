@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://via.placeholder.com/150?text=Logo" width="100" alt="Insurance Pricing Logo">
+<img src=".assets/logo.png" width="100" alt="Insurance Pricing Logo">
 
 # 💰 Insurance Premium Pricing
 
