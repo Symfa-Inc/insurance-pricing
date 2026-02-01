@@ -71,9 +71,3 @@ out/
 # OS
 .DS_Store
 Thumbs.db
-
-# Project specific
-backend/data/*
-!backend/data/.gitkeep
-backend/models/*
-!backend/models/.gitkeep
