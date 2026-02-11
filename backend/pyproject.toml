@@ -14,7 +14,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "autogluon.tabular>=1.5.0",
     "httpx>=0.28.1",
+    "joblib>=1.4.0",
     "matplotlib>=3.9.0",
     "mypy>=1.19.1",
     "numpy>=2.0.0",
@@ -22,6 +24,7 @@ dev = [
     "pre-commit>=4.5.1",
     "pytest>=9.0.2",
     "ruff>=0.14.14",
+    "scikit-learn>=1.5.0",
     "scipy>=1.14.0",
     "seaborn>=0.13.0",
 ]
