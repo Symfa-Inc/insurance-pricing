@@ -68,7 +68,6 @@ class InsuranceDataTransformer(TabularPredictor):
         self.schema_features: list[str] = FEATURE_COLUMNS[:]
         self.schema_target: str = TARGET_COLUMN
         self.raw_feature_ranges: dict[str, tuple[float, float]] = {}
-        self.transformed_feature_ranges: dict[str, tuple[float, float]] = {}
 
     @staticmethod
     def _iqr_bounds(
@@ -136,14 +135,14 @@ class InsuranceDataTransformer(TabularPredictor):
             for col in ["age", "bmi", "children"]
         }
 
-        transformed_train = self._transform_features_internal(train_df)
-        self.transformed_feature_ranges = {
-            col: (
-                float(transformed_train[col].min()),
-                float(transformed_train[col].max()),
-            )
-            for col in transformed_train.columns
-        }
+        # Fit feature scaler on train data once, during transformer fitting.
+        t = train_df.copy()
+        t["bmi"] = self._winsorize(t["bmi"], self.winsorize_bounds["bmi"])
+        t = self._apply_encoding(t)
+        t = self._add_interactions(t)
+        x_matrix = t[self.feature_columns].copy()
+        self.feature_scaler = StandardScaler()
+        self.feature_scaler.fit(x_matrix[self.scale_feature_columns])
 
         if SCALE_TARGET:
             self.target_scaler = StandardScaler()
@@ -203,6 +202,7 @@ class InsuranceDataTransformer(TabularPredictor):
         warnings: list[str] = []
         row = df.iloc[0]
 
+        # User-facing warnings should be only in original input space.
         for col, (low, high) in self.raw_feature_ranges.items():
             value = float(row[col])
             if value < low or value > high:
@@ -214,14 +214,6 @@ class InsuranceDataTransformer(TabularPredictor):
             warnings.append(
                 f"region='{row['region']}' was not observed in training data",
             )
-
-        transformed = self.transform_features(df).iloc[0]
-        for col, (low, high) in self.transformed_feature_ranges.items():
-            value = float(transformed[col])
-            if value < low or value > high:
-                warnings.append(
-                    f"{col}={value:.4f} is outside transformed train range [{low:.4f}, {high:.4f}]",
-                )
 
         return warnings
 
