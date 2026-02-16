@@ -7,7 +7,7 @@ from pathlib import Path
 from fastapi import FastAPI
 
 from insurance_pricing.config import Settings
-from insurance_pricing.services.model_loader import load_model, load_transform_params
+from insurance_pricing.services.model_loader import load_model, load_transformer
 
 
 def create_lifespan(
@@ -16,9 +16,9 @@ def create_lifespan(
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.model = None
-        app.state.transform_params = None
+        app.state.transformer = None
         app.state.model_error = None
-        app.state.transform_params_error = None
+        app.state.transformer_error = None
         app.state.model_version = None
 
         try:
@@ -29,17 +29,17 @@ def create_lifespan(
             app.state.model_error = str(exc)
 
         try:
-            transform_params = load_transform_params(settings.transform_params_path)
-            app.state.transform_params = transform_params
-        except Exception as exc:  # noqa: BLE001 - keep app running without params
-            app.state.transform_params_error = str(exc)
+            transformer = load_transformer(settings.transformer_path)
+            app.state.transformer = transformer
+        except Exception as exc:  # noqa: BLE001 - keep app running without transformer
+            app.state.transformer_error = str(exc)
 
         yield
 
         app.state.model = None
-        app.state.transform_params = None
+        app.state.transformer = None
         app.state.model_error = None
-        app.state.transform_params_error = None
+        app.state.transformer_error = None
         app.state.model_version = None
 
     return lifespan

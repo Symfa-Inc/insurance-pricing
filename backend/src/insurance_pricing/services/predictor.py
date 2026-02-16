@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from scripts.stages.prepare_data import inverse_transform_target, transform_features
 
 from insurance_pricing.schemas.predict import PredictRequest
 
@@ -35,25 +34,10 @@ def preprocess_features(payload: PredictRequest) -> np.ndarray:
 
 def check_extrapolation(
     payload: PredictRequest,
-    transform_params: dict[str, Any],
+    transformer: Any,
 ) -> list[str]:
-    warnings: list[str] = []
-    bounds = transform_params.get("winsorize_bounds", {})
-
-    bmi_bounds = bounds.get("bmi")
-    if bmi_bounds and len(bmi_bounds) == 2:
-        low, high = float(bmi_bounds[0]), float(bmi_bounds[1])
-        if payload.bmi < low or payload.bmi > high:
-            warnings.append(
-                f"bmi={payload.bmi} is outside training-supported range [{low:.2f}, {high:.2f}]",
-            )
-
-    mappings = transform_params.get("encode_mappings", {})
-    categories = mappings.get("onehot_region_categories")
-    if categories and payload.region not in set(categories):
-        warnings.append(f"region='{payload.region}' was not observed in training data")
-
-    return warnings
+    feature_frame = _payload_to_frame(payload)
+    return list(transformer.check_extrapolation(feature_frame))
 
 
 def _payload_to_frame(payload: PredictRequest) -> pd.DataFrame:
@@ -74,10 +58,10 @@ def _payload_to_frame(payload: PredictRequest) -> pd.DataFrame:
 def predict_charges(
     model: Any,
     payload: PredictRequest,
-    transform_params: dict[str, Any],
+    transformer: Any,
 ) -> float:
     feature_frame = _payload_to_frame(payload)
-    transformed_features = transform_features(feature_frame, transform_params)
+    transformed_features = transformer.transform_features(feature_frame)
     transformed_prediction = model.predict(transformed_features)
-    charges = inverse_transform_target(transformed_prediction, transform_params)
+    charges = transformer.inverse_transform_target(transformed_prediction)
     return float(np.asarray(charges).reshape(-1)[0])

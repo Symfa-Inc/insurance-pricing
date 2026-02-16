@@ -1,4 +1,4 @@
-from insurance_pricing.services.model_loader import load_model, load_transform_params
+from insurance_pricing.services.model_loader import load_model, load_transformer
 from insurance_pricing.services.predictor import (
     check_extrapolation,
     predict_charges,
@@ -7,7 +7,7 @@ from insurance_pricing.services.predictor import (
 
 __all__ = [
     "load_model",
-    "load_transform_params",
+    "load_transformer",
     "check_extrapolation",
     "predict_charges",
     "preprocess_features",

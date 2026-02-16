@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Any
 
 import joblib
+from autogluon.tabular import TabularPredictor
+from train.stages.prepare_data import InsuranceDataTransformer
 
 
 def load_model(model_path: str | Path) -> Any:
@@ -12,6 +14,8 @@ def load_model(model_path: str | Path) -> Any:
     if not path.exists():
         raise FileNotFoundError(f"Model file not found at: {path}")
 
+    if path.is_dir():
+        return TabularPredictor.load(str(path))
     try:
         return joblib.load(path)
     except Exception:
@@ -19,12 +23,14 @@ def load_model(model_path: str | Path) -> Any:
             return pickle.load(model_file)  # noqa: S301 - trusted local artifact
 
 
-def load_transform_params(params_path: str | Path) -> dict[str, Any]:
-    path = Path(params_path)
+def load_transformer(transformer_path: str | Path) -> InsuranceDataTransformer:
+    path = Path(transformer_path)
     if not path.exists():
-        raise FileNotFoundError(f"Transform params file not found at: {path}")
+        raise FileNotFoundError(f"Transformer file not found at: {path}")
 
     loaded = joblib.load(path)
-    if not isinstance(loaded, dict):
-        raise ValueError("Transform params artifact must be a dictionary.")
+    if not isinstance(loaded, InsuranceDataTransformer):
+        raise ValueError(
+            f"Transformer artifact must be InsuranceDataTransformer, got {type(loaded).__name__}.",
+        )
     return loaded

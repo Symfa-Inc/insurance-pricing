@@ -6,9 +6,9 @@ from insurance_pricing.services.predictor import check_extrapolation, predict_ch
 
 def run_prediction(payload: PredictRequest, request: Request) -> PredictResponse:
     model = getattr(request.app.state, "model", None)
-    transform_params = getattr(request.app.state, "transform_params", None)
+    transformer = getattr(request.app.state, "transformer", None)
     model_error = getattr(request.app.state, "model_error", None)
-    transform_params_error = getattr(request.app.state, "transform_params_error", None)
+    transformer_error = getattr(request.app.state, "transformer_error", None)
     model_version = getattr(request.app.state, "model_version", None)
 
     if model is None:
@@ -20,10 +20,10 @@ def run_prediction(payload: PredictRequest, request: Request) -> PredictResponse
             detail=detail,
         )
 
-    if transform_params is None:
-        detail = "Transform params artifact is unavailable."
-        if transform_params_error:
-            detail = f"{detail} {transform_params_error}"
+    if transformer is None:
+        detail = "Transformer artifact is unavailable."
+        if transformer_error:
+            detail = f"{detail} {transformer_error}"
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=detail,
@@ -32,12 +32,12 @@ def run_prediction(payload: PredictRequest, request: Request) -> PredictResponse
     try:
         warnings = check_extrapolation(
             payload=payload,
-            transform_params=transform_params,
+            transformer=transformer,
         )
         charges = predict_charges(
             model=model,
             payload=payload,
-            transform_params=transform_params,
+            transformer=transformer,
         )
     except Exception as exc:  # noqa: BLE001 - ensure clear API response
         raise HTTPException(
