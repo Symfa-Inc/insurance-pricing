@@ -1,40 +1,35 @@
 #!/usr/bin/env python3
 """
 Train a regression model with AutoGluon on the prepared insurance data.
-
-Reads backend/data/train.csv (prepared by prepare_data.py), fits a
-TabularPredictor optimized for MAPE with regularization and K-fold
-cross-validation (bagging). Default preset is best_quality for max
-performance (competitive in AutoML settings). Saves to backend/models/.
 """
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import pandas as pd
 from autogluon.tabular import TabularPredictor
 
-from scripts.ag_metrics import MAPE_SCORER
+if __package__ in (None, ""):
+    src_dir = Path(__file__).resolve().parents[2]
+    if str(src_dir) not in sys.path:
+        sys.path.insert(0, str(src_dir))
 
-# -----------------------------------------------------------------------------
-# Configuration and paths (aligned with prepare_data)
-# -----------------------------------------------------------------------------
+from train.settings import get_scripts_settings
+from train.stages.ag_metrics import MAPE_SCORER
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-BACKEND_DIR = SCRIPT_DIR.parent.parent
-DATA_DIR = BACKEND_DIR / "data"
-MODELS_DIR = BACKEND_DIR / "models"
-TRAIN_PATH = DATA_DIR / "train.csv"
+from insurance_pricing import MODELS_DIR
+
+SETTINGS = get_scripts_settings()
+TRAIN_PATH = SETTINGS.train_data_path
 PREDICTOR_DIR_NAME = "ag_insurance"
-DEFAULT_TIME_LIMIT = 300  # seconds
-DEFAULT_NUM_BAG_FOLDS = 5  # K-fold cross-validation for bagging
-DEFAULT_NUM_BAG_SETS = 1  # number of bagging replicates
+DEFAULT_TIME_LIMIT = SETTINGS.default_time_limit
+DEFAULT_NUM_BAG_FOLDS = SETTINGS.default_num_bag_folds
+DEFAULT_NUM_BAG_SETS = SETTINGS.default_num_bag_sets
 
 TARGET_COLUMN = "charges"
 
-# Regularization-focused hyperparameters to reduce overfitting and improve MAPE
-# (shallower trees, L1/L2 on GBM/XGB, conservative RF/XT)
 REGULARIZED_HYPERPARAMETERS = {
     "GBM": [
         {
@@ -96,20 +91,16 @@ def train_and_save(
     num_bag_folds: int | None = DEFAULT_NUM_BAG_FOLDS,
     num_bag_sets: int | None = DEFAULT_NUM_BAG_SETS,
 ) -> Path:
-    """
-    Load prepared train data, fit AutoGluon TabularPredictor, save to model_dir.
-
-    Uses MAPE as evaluation metric and regularized hyperparameters by default.
-    Cross-validation is enabled via num_bag_folds (K-fold bagging).
-    """
     train_path = train_path or TRAIN_PATH
     model_dir = model_dir or (MODELS_DIR / PREDICTOR_DIR_NAME)
     eval_metric = eval_metric if eval_metric is not None else MAPE_SCORER
-    hyperparameters = hyperparameters if hyperparameters is not None else REGULARIZED_HYPERPARAMETERS
+    hyperparameters = (
+        hyperparameters if hyperparameters is not None else REGULARIZED_HYPERPARAMETERS
+    )
 
     if not train_path.exists():
         raise FileNotFoundError(
-            f"Train data not found: {train_path}. Run prepare_data.py first."
+            f"Train data not found: {train_path}. Run prepare_data.py first.",
         )
 
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
@@ -118,7 +109,7 @@ def train_and_save(
     if TARGET_COLUMN not in train_df.columns:
         raise ValueError(
             f"Target column '{TARGET_COLUMN}' not in {train_path}. "
-            "Expected prepared data with charges."
+            "Expected prepared data with charges.",
         )
 
     predictor = TabularPredictor(
@@ -143,10 +134,11 @@ def train_and_save(
 
 
 def main() -> None:
-    """Train model and save artifact to backend/models."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Train AutoGluon model on prepared insurance data.")
+    parser = argparse.ArgumentParser(
+        description="Train AutoGluon model on prepared insurance data.",
+    )
     parser.add_argument(
         "--time-limit",
         type=int,
@@ -157,7 +149,7 @@ def main() -> None:
         "--presets",
         type=str,
         default="best_quality",
-        help="AutoGluon presets: best_quality (max performance), high_quality, medium_quality, etc.",
+        help="AutoGluon presets: best_quality, high_quality, medium_quality, etc.",
     )
     parser.add_argument(
         "--no-regularization",
@@ -169,14 +161,14 @@ def main() -> None:
         type=int,
         default=DEFAULT_NUM_BAG_FOLDS,
         metavar="K",
-        help=f"K-fold cross-validation for bagging (default: {DEFAULT_NUM_BAG_FOLDS}). Use 0 to disable.",
+        help=f"K-fold cross-validation for bagging (default: {DEFAULT_NUM_BAG_FOLDS}).",
     )
     parser.add_argument(
         "--num-bag-sets",
         type=int,
         default=DEFAULT_NUM_BAG_SETS,
         metavar="N",
-        help=f"Number of bagging sets (default: {DEFAULT_NUM_BAG_SETS}). Use 0 to disable.",
+        help=f"Number of bagging sets (default: {DEFAULT_NUM_BAG_SETS}).",
     )
     args = parser.parse_args()
 
