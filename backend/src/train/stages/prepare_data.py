@@ -24,9 +24,8 @@ if __package__ in (None, ""):
     if str(src_dir) not in sys.path:
         sys.path.insert(0, str(src_dir))
 
-from train.settings import get_scripts_settings
-
 from insurance_pricing import DATA_DIR
+from train.settings import get_scripts_settings
 
 RANDOM_SEED = 42
 np.random.seed(RANDOM_SEED)

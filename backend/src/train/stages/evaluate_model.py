@@ -19,10 +19,9 @@ if __package__ in (None, ""):
 
 # Import so saved predictor (trained with custom MAPE metric) can be unpickled.
 import train.stages.ag_metrics  # noqa: F401
+from insurance_pricing import MODELS_DIR, NOTEBOOKS_DIR
 from train.settings import get_scripts_settings
 from train.stages.prepare_data import TARGET_COLUMN, InsuranceDataTransformer
-
-from insurance_pricing import MODELS_DIR, NOTEBOOKS_DIR
 
 SETTINGS = get_scripts_settings()
 TEST_PATH = SETTINGS.test_data_path

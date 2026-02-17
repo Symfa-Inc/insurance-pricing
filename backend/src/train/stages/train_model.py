@@ -16,10 +16,9 @@ if __package__ in (None, ""):
     if str(src_dir) not in sys.path:
         sys.path.insert(0, str(src_dir))
 
+from insurance_pricing import MODELS_DIR
 from train.settings import get_scripts_settings
 from train.stages.ag_metrics import MAPE_SCORER
-
-from insurance_pricing import MODELS_DIR
 
 SETTINGS = get_scripts_settings()
 TRAIN_PATH = SETTINGS.train_data_path
