@@ -10,7 +10,6 @@ backend/
 │   ├── api/v1/             # Versioned HTTP endpoints
 │   ├── schemas/            # Pydantic request/response schemas
 │   ├── services/           # Model loading and prediction logic
-│   ├── frontend/           # Compiled SPA static output
 │   ├── config.py           # App settings + CORS origins
 │   ├── lifespan.py         # Startup model loading
 │   ├── __init__.py
@@ -64,26 +63,9 @@ uv run ruff format src/
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/` | Basic JS app page |
-| POST | `/predict` | Predict from JS app |
 | GET | `/api/v1/health` | Health check |
 | GET | `/api/v1/version` | App name and version |
 | POST | `/api/v1/predict` | Predict insurance premium |
-
-## 🧩 Frontend Static Layout
-
-The backend is prepared to serve a compiled SPA bundle.
-
-- Place frontend build artifacts in `backend/src/insurance_pricing/frontend/`
-- The home endpoint `GET /` returns `backend/src/insurance_pricing/frontend/index.html` (if present)
-- Static assets are served under `GET /static/...`
-- If `backend/src/insurance_pricing/frontend/index.html` is missing, backend returns a minimal placeholder HTML
-
-You can override static directory via:
-
-```bash
-FRONTEND_STATIC_DIR=/absolute/path/to/static uv run uvicorn insurance_pricing.main:app --reload
-```
 
 ## ⚙️ Dependency Note (pyproject-compatible)
 
