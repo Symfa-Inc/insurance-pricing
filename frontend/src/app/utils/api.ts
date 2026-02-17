@@ -11,7 +11,7 @@ function isPredictResponse(value: unknown): value is PredictResponse {
   return typeof maybeResponse.charges === "number";
 }
 
-export async function predict(
+export async function predictInsurancePricing(
   payload: PredictRequest,
   signal?: AbortSignal,
 ): Promise<PredictResponse> {

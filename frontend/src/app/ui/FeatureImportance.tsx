@@ -5,33 +5,30 @@ interface FeatureImportanceProps {
 }
 
 export function FeatureImportance({ items }: FeatureImportanceProps) {
-  const hasItems = Boolean(items && items.length > 0);
-
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-zinc-900">What influenced the estimate</h2>
-      {hasItems ? (
-        <ul className="mt-4 space-y-3">
-          {items?.map((item) => (
-            <li key={item.name} className="space-y-1">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-zinc-700">{item.name}</span>
-                <span className="font-medium text-zinc-900">{item.value.toFixed(3)}</span>
-              </div>
-              <div className="h-2 rounded-full bg-zinc-100">
-                <div
-                  className="h-2 rounded-full bg-zinc-700"
-                  style={{ width: `${Math.max(4, Math.min(100, item.value * 100))}%` }}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-4 text-sm leading-6 text-zinc-600">
-          Feature importance not available for this model yet.
+    <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+          Explainability
         </p>
-      )}
+        <h3 className="text-2xl font-semibold text-slate-900">What influenced the estimate</h3>
+      </div>
+      <ul className="mt-6 space-y-4">
+        {items?.map((item) => (
+          <li key={item.name} className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium text-slate-700">{item.name}</span>
+              <span className="text-slate-500">{item.value.toFixed(2)}</span>
+            </div>
+            <div className="h-3 rounded-full bg-slate-100">
+              <div
+                className="h-3 rounded-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400"
+                style={{ width: `${item.value * 100}%` }}
+              />
+            </div>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

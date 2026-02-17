@@ -1,85 +1,77 @@
 import type {
-  CategoricalFeatureDefinition,
-  FeatureDefinition,
-  NumericFeatureDefinition,
+  FeatureFormValues,
+  FeatureSchema,
 } from "@/app/config/features";
 
 interface FeaturePanelProps {
-  feature: FeatureDefinition;
-  value: string | number;
-  onChange: (nextValue: string | number) => void;
+  title: string;
+  features: readonly FeatureSchema[];
+  values: FeatureFormValues;
+  onChange: (id: FeatureSchema["id"], nextValue: string) => void;
+  onSubmit: () => void;
+  isSubmitting: boolean;
+  submitDisabled?: boolean;
 }
 
-function NumericField({
-  feature,
-  value,
+export function FeaturePanel({
+  title,
+  features,
+  values,
   onChange,
-}: {
-  feature: NumericFeatureDefinition;
-  value: number;
-  onChange: (nextValue: number) => void;
-}) {
+  onSubmit,
+  isSubmitting,
+  submitDisabled = false,
+}: FeaturePanelProps) {
   return (
-    <input
-      id={feature.key}
-      type="number"
-      value={value}
-      min={feature.min}
-      max={feature.max}
-      step={feature.step}
-      onChange={(event) => onChange(Number(event.target.value))}
-      className="mt-2 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
-    />
-  );
-}
-
-function CategoricalField({
-  feature,
-  value,
-  onChange,
-}: {
-  feature: CategoricalFeatureDefinition;
-  value: string;
-  onChange: (nextValue: string) => void;
-}) {
-  return (
-    <select
-      id={feature.key}
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      className="mt-2 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
-    >
-      {feature.options.map((option) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
-  );
-}
-
-export function FeaturePanel({ feature, value, onChange }: FeaturePanelProps) {
-  return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-      <label htmlFor={feature.key} className="block text-sm font-medium text-zinc-900">
-        {feature.label}
-      </label>
-      {feature.description ? (
-        <p className="mt-1 text-xs text-zinc-500">{feature.description}</p>
-      ) : null}
-      {feature.type === "numeric" ? (
-        <NumericField
-          feature={feature}
-          value={Number(value)}
-          onChange={(nextValue) => onChange(nextValue)}
-        />
-      ) : (
-        <CategoricalField
-          feature={feature}
-          value={String(value)}
-          onChange={(nextValue) => onChange(nextValue)}
-        />
-      )}
-    </div>
+    <aside className="w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:w-72">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{title}</p>
+      <div className="mt-5 space-y-5">
+        {features.map((feature) => (
+          <label
+            key={feature.id}
+            htmlFor={feature.id}
+            className="block space-y-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-3"
+          >
+            <span className="text-sm font-medium text-slate-700">
+              {feature.label}
+            </span>
+            {feature.type === "number" ? (
+              <input
+                id={feature.id}
+                type="number"
+                value={values[feature.id]}
+                placeholder={feature.placeholder}
+                onChange={(event) => onChange(feature.id, event.target.value)}
+                className="flex-1 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 tabular-nums focus:border-slate-400 focus:outline-none"
+              />
+            ) : (
+              <select
+                id={feature.id}
+                value={values[feature.id]}
+                onChange={(event) => onChange(feature.id, event.target.value)}
+                className="w-full rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+              >
+                {feature.options.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            )}
+            {"help" in feature && feature.help ? (
+              <p className="text-xs text-slate-500">{feature.help}</p>
+            ) : null}
+          </label>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={onSubmit}
+        disabled={isSubmitting || submitDisabled}
+        className="mt-6 w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {isSubmitting ? "Estimating..." : "Estimate"}
+      </button>
+    </aside>
   );
 }

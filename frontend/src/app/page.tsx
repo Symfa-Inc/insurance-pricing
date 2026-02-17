@@ -1,162 +1,164 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
-  createDefaultInputs,
-  FEATURE_DEFINITIONS,
-  type FeatureDefinition,
+  createInitialFeatureValues,
+  FEATURE_SCHEMA,
+  type FeatureFormValues,
+  type FeatureSchema,
 } from "@/app/config/features";
 import type { PredictRequest, PredictResponse } from "@/app/types/api";
-import { predict } from "@/app/utils/api";
+import { predictInsurancePricing } from "@/app/utils/api";
 import { FeatureImportance } from "@/app/ui/FeatureImportance";
 import { FeaturePanel } from "@/app/ui/FeaturePanel";
-import { formatCurrencyUSD, StatusSummary } from "@/app/ui/StatusSummary";
+import { StatusSummary, formatCurrencyUSD } from "@/app/ui/StatusSummary";
 
-function buildPredictionSummary(inputs: PredictRequest, response: PredictResponse | null): string {
-  if (!response) {
+function buildPredictionSummary(payload: PredictRequest | null, response: PredictResponse | null): string {
+  if (!payload || !response) {
     return "Adjust inputs to generate an estimate.";
   }
 
-  const profileDetails = [
-    `age ${inputs.age}`,
-    `BMI ${inputs.bmi.toFixed(1)}`,
-    `${inputs.children} dependents`,
-    `smoker ${inputs.smoker}`,
-    `${inputs.region} region`,
+  const details = [
+    `age ${payload.age}`,
+    `BMI ${payload.bmi}`,
+    `${payload.children} dependents`,
+    `smoker ${payload.smoker}`,
+    `${payload.region} region`,
   ];
 
-  return `Based on the current input profile (${profileDetails.join(", ")}), estimated annual charges are ${formatCurrencyUSD(response.charges)}.`;
+  return `Estimate generated from the submitted profile (${details.join(", ")}): ${formatCurrencyUSD(response.charges)} per year.`;
 }
 
-function groupFeatures(features: readonly FeatureDefinition[]) {
-  const sortedFeatures = [...features].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  const grouped = new Map<string, FeatureDefinition[]>();
+function toPredictRequest(
+  formValues: FeatureFormValues,
+  features: readonly FeatureSchema[],
+): { payload: PredictRequest | null; error: string | null } {
+  const payload: Partial<PredictRequest> = {};
 
-  sortedFeatures.forEach((feature) => {
-    const groupName = feature.group ?? "General";
-    const current = grouped.get(groupName) ?? [];
-    current.push(feature);
-    grouped.set(groupName, current);
-  });
+  for (const feature of features) {
+    const rawValue = formValues[feature.id].trim();
 
-  return Array.from(grouped.entries()).map(([name, definitions]) => ({
-    name,
-    definitions,
-  }));
+    if (feature.type === "number") {
+      if (rawValue.length === 0) {
+        return { payload: null, error: `${feature.label} is required.` };
+      }
+
+      const parsed = Number(rawValue);
+      if (!Number.isFinite(parsed)) {
+        return { payload: null, error: `${feature.label} must be a valid number.` };
+      }
+
+      payload[feature.id] = parsed as PredictRequest[typeof feature.id];
+      continue;
+    }
+
+    payload[feature.id] = rawValue as PredictRequest[typeof feature.id];
+  }
+
+  return { payload: payload as PredictRequest, error: null };
 }
 
 export default function Home() {
-  const [inputs, setInputs] = useState<PredictRequest>(() => createDefaultInputs(FEATURE_DEFINITIONS));
+  const [formValues, setFormValues] = useState<FeatureFormValues>(() =>
+    createInitialFeatureValues(FEATURE_SCHEMA),
+  );
   const [prediction, setPrediction] = useState<PredictResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const groupedFeatures = useMemo(() => groupFeatures(FEATURE_DEFINITIONS), []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const debounceTimer = window.setTimeout(async () => {
-      try {
-        setIsLoading(true);
-        setErrorMessage(null);
-        const nextPrediction = await predict(inputs, controller.signal);
-        setPrediction(nextPrediction);
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-
-        setErrorMessage("Unable to refresh the estimate right now. You can keep adjusting inputs.");
-      } finally {
-        setIsLoading(false);
-      }
-    }, 320);
-
-    return () => {
-      controller.abort();
-      window.clearTimeout(debounceTimer);
-    };
-  }, [inputs]);
+  const [lastSubmittedPayload, setLastSubmittedPayload] = useState<PredictRequest | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const summaryText = useMemo(
-    () => buildPredictionSummary(inputs, prediction),
-    [inputs, prediction],
+    () => buildPredictionSummary(lastSubmittedPayload, prediction),
+    [lastSubmittedPayload, prediction],
   );
 
-  const auxFields = useMemo(() => {
-    if (!prediction?.model_version) {
-      return undefined;
+  const handleFeatureChange = (id: FeatureSchema["id"], nextValue: string) => {
+    setFormValues((previous) => ({
+      ...previous,
+      [id]: nextValue,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    setSubmitError(null);
+    const { payload, error } = toPredictRequest(formValues, FEATURE_SCHEMA);
+
+    if (!payload) {
+      setSubmitError(error ?? "Please review your inputs.");
+      return;
     }
 
-    return [{ label: "Model version", value: prediction.model_version }];
-  }, [prediction?.model_version]);
-
-  const handleFeatureChange = (feature: FeatureDefinition, nextValue: string | number) => {
-    setInputs((previous) => {
-      if (feature.type === "numeric") {
-        const parsedValue = Number(nextValue);
-        const safeValue = Number.isFinite(parsedValue) ? parsedValue : feature.defaultValue;
-        return {
-          ...previous,
-          [feature.key]: safeValue as PredictRequest[typeof feature.key],
-        };
-      }
-
-      return {
-        ...previous,
-        [feature.key]: String(nextValue) as PredictRequest[typeof feature.key],
-      };
-    });
+    try {
+      setIsSubmitting(true);
+      const response = await predictInsurancePricing(payload);
+      setPrediction(response);
+      setLastSubmittedPayload(payload);
+    } catch {
+      setSubmitError("Unable to estimate charges right now. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-6 py-8 text-zinc-900">
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <header>
-          <p className="text-sm font-medium uppercase tracking-wide text-zinc-500">
-            Insurance Pricing Inputs
-          </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">Inputs</h1>
-        </header>
+    <div
+      className="min-h-screen bg-slate-50 text-slate-900"
+      style={{
+        backgroundImage:
+          "radial-gradient(circle at top left, rgba(99,102,241,0.14), transparent 45%), radial-gradient(circle at 30% 20%, rgba(99,102,241,0.12), transparent 40%), radial-gradient(circle at 90% 10%, rgba(148,163,184,0.16), transparent 45%)",
+      }}
+    >
+      <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10 md:flex-row">
+        <FeaturePanel
+          title="Insurance Pricing Inputs"
+          features={FEATURE_SCHEMA}
+          values={formValues}
+          onChange={handleFeatureChange}
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+        />
 
-        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-zinc-900">Inputs</h2>
-            <div className="mt-5 space-y-5">
-              {groupedFeatures.map((group) => (
-                <div key={group.name}>
-                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                    {group.name}
-                  </h3>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    {group.definitions.map((feature) => (
-                      <FeaturePanel
-                        key={feature.key}
-                        feature={feature}
-                        value={inputs[feature.key]}
-                        onChange={(nextValue) => handleFeatureChange(feature, nextValue)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
+        <section className="flex-1">
+          <div className="space-y-8 md:sticky md:top-8 md:self-start">
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Inputs</p>
+              <h1 className="mt-3 text-3xl font-semibold text-slate-900">Estimated annual charges</h1>
+              <p className="mt-3 text-sm text-slate-500">
+                Submit inputs from the sidebar to generate a pricing estimate.
+              </p>
             </div>
-          </section>
 
-          <div className="flex flex-col gap-6">
             <StatusSummary
               headline="Estimated annual charges"
               summary={summaryText}
-              value={prediction?.charges}
-              unit="$"
-              auxFields={auxFields}
-              isLoading={isLoading}
-              errorMessage={errorMessage}
+              value={prediction?.charges ?? null}
+              modelVersion={prediction?.model_version}
             />
-            <FeatureImportance items={prediction?.feature_importance} />
+
+            {submitError ? (
+              <div className="rounded-2xl border border-rose-100 bg-rose-50 p-6 text-sm text-rose-700 shadow-sm">
+                {submitError}
+              </div>
+            ) : null}
+
+            {prediction?.feature_importance ? (
+              <FeatureImportance items={prediction.feature_importance} />
+            ) : (
+              <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    Explainability
+                  </p>
+                  <h3 className="text-2xl font-semibold text-slate-900">What influenced the estimate</h3>
+                </div>
+                <p className="mt-6 text-sm text-slate-500">
+                  Feature importance not available for this model yet.
+                </p>
+              </section>
+            )}
           </div>
-        </div>
+        </section>
       </main>
     </div>
   );
