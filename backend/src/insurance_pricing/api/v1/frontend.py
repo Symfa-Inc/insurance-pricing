@@ -1,25 +1,17 @@
-from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, HTTPException, status
+from fastapi.responses import FileResponse, HTMLResponse
 
-SPA_ENTRY_HTML = """<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Insurance Pricing App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script>
-      console.log("SPA loaded");
-    </script>
-  </body>
-</html>
-"""
+from insurance_pricing import FRONTEND_STATIC_DIR
 
 router = APIRouter(tags=["frontend"])
 
 
 @router.get("/", response_class=HTMLResponse)
-async def spa_entrypoint() -> HTMLResponse:
-    return HTMLResponse(content=SPA_ENTRY_HTML)
+async def spa_entrypoint() -> FileResponse:
+    index_path = FRONTEND_STATIC_DIR / "index.html"
+    if not index_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Frontend entrypoint is missing at {index_path}",
+        )
+    return FileResponse(index_path)

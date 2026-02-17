@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from insurance_pricing.api.router import api_router, root_router
 from insurance_pricing.config import get_settings
@@ -19,6 +20,13 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+# Compiled SPA assets are expected under backend/static.
+app.mount(
+    "/static",
+    StaticFiles(directory=settings.frontend_static_dir, check_dir=False),
+    name="static",
 )
 
 app.include_router(root_router)

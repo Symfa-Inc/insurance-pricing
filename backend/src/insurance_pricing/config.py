@@ -6,7 +6,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, field_validator
 
-from insurance_pricing import MODELS_DIR
+from insurance_pricing import FRONTEND_STATIC_DIR, MODELS_DIR
 
 DEFAULT_CORS_ORIGINS = ("http://localhost:5173", "http://localhost:3000")
 
@@ -16,6 +16,7 @@ class Settings(BaseModel):
     app_version: str = "0.1.0"
     model_path: Path = MODELS_DIR / "ag_insurance"
     transformer_path: Path = MODELS_DIR / "feature_transformer.joblib"
+    frontend_static_dir: Path = FRONTEND_STATIC_DIR
     cors_origins: list[str] = Field(default_factory=lambda: list(DEFAULT_CORS_ORIGINS))
 
     @field_validator("cors_origins", mode="before")
@@ -50,6 +51,12 @@ class Settings(BaseModel):
                         "TRANSFORM_PARAMS_PATH",
                         str(cls.model_fields["transformer_path"].default),
                     ),
+                ),
+            ),
+            frontend_static_dir=Path(
+                os.getenv(
+                    "FRONTEND_STATIC_DIR",
+                    str(cls.model_fields["frontend_static_dir"].default),
                 ),
             ),
             cors_origins=os.getenv("CORS_ORIGINS", ",".join(DEFAULT_CORS_ORIGINS)),

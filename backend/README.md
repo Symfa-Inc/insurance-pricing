@@ -7,6 +7,12 @@ FastAPI backend for the Insurance Premium Prediction system with ML-powered expl
 ```
 backend/
 ├── src/insurance_pricing/  # Python package (API code)
+│   ├── api/v1/             # Versioned HTTP endpoints
+│   ├── schemas/            # Pydantic request/response schemas
+│   ├── services/           # Model loading and prediction logic
+│   ├── frontend/           # Compiled SPA static output
+│   ├── config.py           # App settings + CORS origins
+│   ├── lifespan.py         # Startup model loading
 │   ├── __init__.py
 │   └── main.py             # FastAPI application
 ├── models/                 # Trained ML model artifacts
@@ -19,11 +25,9 @@ backend/
 ## 🚀 Quick Start
 
 ```bash
-# From project root
-uv sync                     # Install dependencies
-
-# Run the API
-uv run uvicorn insurance_pricing.main:app --reload --port 8000
+# From backend/
+uv sync
+uv run uvicorn insurance_pricing.main:app --reload
 ```
 
 - API: http://localhost:8000
@@ -60,6 +64,64 @@ uv run ruff format src/
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/health` | Health check |
-| POST | `/predict` | Predict insurance premium |
-| POST | `/explain` | Get SHAP explanations |
+| GET | `/` | Basic JS app page |
+| POST | `/predict` | Predict from JS app |
+| GET | `/api/v1/health` | Health check |
+| GET | `/api/v1/version` | App name and version |
+| POST | `/api/v1/predict` | Predict insurance premium |
+
+## 🧩 Frontend Static Layout
+
+The backend is prepared to serve a compiled SPA bundle.
+
+- Place frontend build artifacts in `backend/src/insurance_pricing/frontend/`
+- The home endpoint `GET /` returns `backend/src/insurance_pricing/frontend/index.html` (if present)
+- Static assets are served under `GET /static/...`
+- If `backend/src/insurance_pricing/frontend/index.html` is missing, backend returns a minimal placeholder HTML
+
+You can override static directory via:
+
+```bash
+FRONTEND_STATIC_DIR=/absolute/path/to/static uv run uvicorn insurance_pricing.main:app --reload
+```
+
+## ⚙️ Dependency Note (pyproject-compatible)
+
+Ensure these runtime dependencies are available (for `[project.dependencies]`):
+
+```toml
+fastapi
+uvicorn
+pydantic
+joblib
+numpy
+```
+
+## 🧾 Curl Examples
+
+```bash
+curl http://localhost:8000/api/v1/health
+curl http://localhost:8000/api/v1/version
+curl -X POST http://localhost:8000/api/v1/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "age": 41,
+    "sex": "female",
+    "bmi": 27.3,
+    "children": 2,
+    "smoker": "no",
+    "region": "northwest"
+  }'
+```
+
+Set a custom artifact path if needed:
+
+```bash
+MODEL_PATH=./model.joblib uv run uvicorn insurance_pricing.main:app --reload
+```
+
+If transforms are stored in a custom path:
+
+```bash
+TRANSFORM_PARAMS_PATH=./data/transform_params.joblib uv run uvicorn insurance_pricing.main:app --reload
+```

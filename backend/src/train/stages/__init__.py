@@ -6,5 +6,4 @@ __all__ = [
     "prepare_data",
     "run_eda",
     "train_model",
-    "transformer",
 ]
