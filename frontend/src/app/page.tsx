@@ -9,8 +9,10 @@ import {
   type FeatureSchema,
 } from "@/app/config/features";
 import type { PredictRequest, PredictResponse } from "@/app/types/api";
-import { predictInsurancePricing } from "@/app/utils/api";
+import type { EdaReportResponse, EvaluationReportResponse } from "@/app/types/reports";
+import { getEdaReport, getEvaluationReport, predictInsurancePricing } from "@/app/utils/api";
 import { FeaturePanel } from "@/app/ui/FeaturePanel";
+import { ReportCard } from "@/app/ui/ReportCard";
 import { formatCurrencyUSD } from "@/app/ui/StatusSummary";
 
 function buildPredictionSummary(payload: PredictRequest | null, response: PredictResponse | null): string {
@@ -107,6 +109,10 @@ export default function Home() {
   const [lastSubmittedPayload, setLastSubmittedPayload] = useState<PredictRequest | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [edaReport, setEdaReport] = useState<EdaReportResponse | null>(null);
+  const [evaluationReport, setEvaluationReport] = useState<EvaluationReportResponse | null>(null);
+  const [reportsLoading, setReportsLoading] = useState(true);
+  const [reportsError, setReportsError] = useState<string | null>(null);
 
   const summaryText = useMemo(
     () => buildPredictionSummary(lastSubmittedPayload, result),
@@ -121,6 +127,34 @@ export default function Home() {
       [id]: nextValue,
     }));
   };
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadReports() {
+      try {
+        setReportsLoading(true);
+        setReportsError(null);
+        const [eda, evaluation] = await Promise.all([
+          getEdaReport(controller.signal),
+          getEvaluationReport(controller.signal),
+        ]);
+        setEdaReport(eda);
+        setEvaluationReport(evaluation);
+      } catch {
+        if (!controller.signal.aborted) {
+          setReportsError("Unable to load reports right now.");
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setReportsLoading(false);
+        }
+      }
+    }
+
+    void loadReports();
+    return () => controller.abort();
+  }, []);
 
   const handleSubmit = async () => {
     setError(null);
@@ -149,8 +183,8 @@ export default function Home() {
   };
 
   const isExpanded = phase !== "center";
-  const containerClass =
-    "mx-auto min-h-screen w-full max-w-6xl px-6 py-10 " +
+  const predictionSectionClass =
+    "w-full " +
     (isExpanded
       ? "flex flex-col gap-8 md:flex-row md:items-start"
       : "flex flex-col items-center justify-start");
@@ -163,187 +197,215 @@ export default function Home() {
           "radial-gradient(circle at top left, rgba(99,102,241,0.14), transparent 45%), radial-gradient(circle at 30% 20%, rgba(99,102,241,0.12), transparent 40%), radial-gradient(circle at 90% 10%, rgba(148,163,184,0.16), transparent 45%)",
       }}
     >
-      <main className={containerClass}>
-        <div
-          className={
-            "w-full md:w-72 transform transition-transform duration-500 ease-out " +
-            (phase === "center"
-              ? "md:translate-x-0"
-              : phase === "mounting"
-                ? "md:-translate-x-6"
-                : "md:-translate-x-6")
-          }
-        >
-          <FeaturePanel
-            title="Insurance Pricing Inputs"
-            features={FEATURE_SCHEMA}
-            values={formValues}
-            onChange={handleFeatureChange}
-            onSubmit={handleSubmit}
-            isSubmitting={loading}
-            submitDisabled={loading}
-            errorMessage={error}
-          />
-        </div>
+      <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
+        <section className="space-y-8">
+          {reportsLoading ? (
+            <article className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+              <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+              <div className="mt-4 h-8 w-48 animate-pulse rounded bg-slate-200" />
+              <div className="mt-6 space-y-3">
+                <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
+                <div className="h-3 w-5/6 animate-pulse rounded bg-slate-100" />
+                <div className="h-3 w-4/6 animate-pulse rounded bg-slate-100" />
+              </div>
+            </article>
+          ) : null}
+          {reportsError ? (
+            <article className="rounded-2xl border border-rose-200 bg-rose-50 p-8 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-rose-400">Reports</p>
+              <h2 className="mt-2 text-2xl font-semibold text-rose-700">Unable to load reports</h2>
+              <p className="mt-3 text-sm text-rose-600">{reportsError}</p>
+            </article>
+          ) : null}
+          {!reportsLoading && !reportsError && edaReport ? (
+            <ReportCard title={edaReport.title} markdown={edaReport.markdown} />
+          ) : null}
+          {!reportsLoading && !reportsError && evaluationReport ? (
+            <ReportCard title={evaluationReport.title} markdown={evaluationReport.markdown} />
+          ) : null}
+        </section>
 
-        {phase !== "center" && result ? (
-          <section
+        <section className={predictionSectionClass}>
+          <div
             className={
-              "flex-1 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm " +
-              "transform transition-all duration-500 ease-out " +
-              (phase === "mounting" ? "opacity-0 translate-y-3" : "opacity-100 translate-y-0")
+              "w-full md:w-72 transform transition-transform duration-500 ease-out " +
+              (phase === "center"
+                ? "md:translate-x-0"
+                : phase === "mounting"
+                  ? "md:-translate-x-6"
+                  : "md:-translate-x-6")
             }
           >
-            <section>
-              <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                <div className="space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                    Estimated annual charges
-                  </p>
-                  <h2 className="text-2xl font-semibold text-slate-900">Pricing estimate</h2>
-                  <p className="text-sm text-slate-500">{summaryText}</p>
-                  {result.model_version ? (
-                    <p className="text-sm text-slate-500">Model version: {result.model_version}</p>
-                  ) : null}
-                </div>
-                <div className="rounded-2xl border border-indigo-100 bg-indigo-50 px-6 py-4 text-center">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
-                    Estimated Charges
-                  </p>
-                  <p className="mt-2 text-3xl font-semibold text-indigo-600">
-                    {formatCurrencyUSD(result.charges)}
-                  </p>
-                </div>
-              </div>
-            </section>
+            <FeaturePanel
+              title="Insurance Pricing Inputs"
+              features={FEATURE_SCHEMA}
+              values={formValues}
+              onChange={handleFeatureChange}
+              onSubmit={handleSubmit}
+              isSubmitting={loading}
+              submitDisabled={loading}
+              errorMessage={error}
+            />
+          </div>
 
-            <div className="mt-6 border-t border-slate-100 pt-6">
-              {result.interpretation ? (
-                <section>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                    Interpretation
-                  </p>
-                  <h3 className="mt-3 text-2xl font-semibold text-slate-900">
-                    {result.interpretation.headline}
-                  </h3>
-                  <ul className="mt-4 list-disc space-y-2 pl-5">
-                    {result.interpretation.bullets.map((bullet) => (
-                      <li key={bullet} className="text-sm text-slate-600">
-                        {bullet}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-5">
+          {phase !== "center" && result ? (
+            <section
+              className={
+                "flex-1 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm " +
+                "transform transition-all duration-500 ease-out " +
+                (phase === "mounting" ? "opacity-0 translate-y-3" : "opacity-100 translate-y-0")
+              }
+            >
+              <section>
+                <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                  <div className="space-y-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                      Caveats
+                      Estimated annual charges
                     </p>
-                    <ul className="mt-2 list-disc space-y-1 pl-5">
-                      {interpretationCaveats.map((caveat) => (
-                        <li key={caveat} className="text-xs text-slate-400">
-                          {caveat}
+                    <h2 className="text-2xl font-semibold text-slate-900">Pricing estimate</h2>
+                    <p className="text-sm text-slate-500">{summaryText}</p>
+                    {result.model_version ? (
+                      <p className="text-sm text-slate-500">Model version: {result.model_version}</p>
+                    ) : null}
+                  </div>
+                  <div className="rounded-2xl border border-indigo-100 bg-indigo-50 px-6 py-4 text-center">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
+                      Estimated Charges
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-indigo-600">
+                      {formatCurrencyUSD(result.charges)}
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <div className="mt-6 border-t border-slate-100 pt-6">
+                {result.interpretation ? (
+                  <section>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                      Interpretation
+                    </p>
+                    <h3 className="mt-3 text-2xl font-semibold text-slate-900">
+                      {result.interpretation.headline}
+                    </h3>
+                    <ul className="mt-4 list-disc space-y-2 pl-5">
+                      {result.interpretation.bullets.map((bullet) => (
+                        <li key={bullet} className="text-sm text-slate-600">
+                          {bullet}
                         </li>
                       ))}
                     </ul>
-                  </div>
-                </section>
-              ) : (
-                <section>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                    Interpretation
-                  </p>
-                  <p className="mt-3 text-sm text-slate-500">
-                    Interpretation is not available for this prediction.
-                  </p>
-                  {extrapolationCaveats.length ? (
                     <div className="mt-5">
                       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
                         Caveats
                       </p>
                       <ul className="mt-2 list-disc space-y-1 pl-5">
-                        {extrapolationCaveats.map((caveat) => (
+                        {interpretationCaveats.map((caveat) => (
                           <li key={caveat} className="text-xs text-slate-400">
                             {caveat}
                           </li>
                         ))}
                       </ul>
                     </div>
-                  ) : null}
-                </section>
-              )}
-            </div>
-
-            <div className="mt-6 border-t border-slate-100 pt-6">
-              {result.shap?.contributions?.length ? (
-                <section>
-                  <div className="space-y-2">
+                  </section>
+                ) : (
+                  <section>
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                      Explainability
+                      Interpretation
                     </p>
-                    <h3 className="text-2xl font-semibold text-slate-900">What influenced the estimate</h3>
-                  </div>
-                  <ul className="mt-6 space-y-4">
-                    {result.shap.contributions.map((item) => {
-                      const maxAbs = Math.max(
-                        ...result.shap!.contributions.map((contribution) => contribution.abs_shap_value),
-                        1e-9,
-                      );
-                      const widthPercent = Math.max(4, (item.abs_shap_value / maxAbs) * 100);
-                      const isPositive = item.shap_value >= 0;
-                      const tone = isPositive
-                        ? "bg-gradient-to-r from-indigo-500 to-indigo-300 text-indigo-700"
-                        : "bg-gradient-to-r from-rose-500 to-rose-300 text-rose-700";
-                      const formattedValue =
-                        typeof item.value === "number"
-                          ? Number.isInteger(item.value)
-                            ? `${item.value}`
-                            : item.value.toFixed(2)
-                          : item.value;
-
-                      return (
-                        <li key={`${item.feature}-${item.value}`} className="space-y-2">
-                          <div className="flex items-center justify-between gap-3 text-sm">
-                            <span className="font-medium text-slate-700">
-                              {item.feature} = {formattedValue}
-                            </span>
-                            <span className={isPositive ? "text-indigo-600" : "text-rose-600"}>
-                              {isPositive ? "+" : "-"}
-                              {Math.abs(item.shap_value).toFixed(2)}
-                            </span>
-                          </div>
-                          <div className="h-3 rounded-full bg-slate-100">
-                            <div className={`h-3 rounded-full ${tone}`} style={{ width: `${widthPercent}%` }} />
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </section>
-              ) : (
-                <section>
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                      Explainability
+                    <p className="mt-3 text-sm text-slate-500">
+                      Interpretation is not available for this prediction.
                     </p>
-                    <h3 className="text-2xl font-semibold text-slate-900">What influenced the estimate</h3>
-                  </div>
-                  <p className="mt-6 text-sm text-slate-500">
-                    SHAP contributions are not available for this prediction.
-                  </p>
-                </section>
-              )}
-            </div>
-
-            {result.explainability_error || result.llm_error ? (
-              <div className="mt-6 border-t border-slate-100 pt-6">
-                <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-700">
-                  {result.explainability_error ? `Explainability: ${result.explainability_error}` : null}
-                  {result.explainability_error && result.llm_error ? " " : null}
-                  {result.llm_error ? `Interpretation: ${result.llm_error}` : null}
-                </div>
+                    {extrapolationCaveats.length ? (
+                      <div className="mt-5">
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                          Caveats
+                        </p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5">
+                          {extrapolationCaveats.map((caveat) => (
+                            <li key={caveat} className="text-xs text-slate-400">
+                              {caveat}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </section>
+                )}
               </div>
-            ) : null}
-          </section>
-        ) : null}
+
+              <div className="mt-6 border-t border-slate-100 pt-6">
+                {result.shap?.contributions?.length ? (
+                  <section>
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                        Explainability
+                      </p>
+                      <h3 className="text-2xl font-semibold text-slate-900">What influenced the estimate</h3>
+                    </div>
+                    <ul className="mt-6 space-y-4">
+                      {result.shap.contributions.map((item) => {
+                        const maxAbs = Math.max(
+                          ...result.shap!.contributions.map((contribution) => contribution.abs_shap_value),
+                          1e-9,
+                        );
+                        const widthPercent = Math.max(4, (item.abs_shap_value / maxAbs) * 100);
+                        const isPositive = item.shap_value >= 0;
+                        const tone = isPositive
+                          ? "bg-gradient-to-r from-indigo-500 to-indigo-300 text-indigo-700"
+                          : "bg-gradient-to-r from-rose-500 to-rose-300 text-rose-700";
+                        const formattedValue =
+                          typeof item.value === "number"
+                            ? Number.isInteger(item.value)
+                              ? `${item.value}`
+                              : item.value.toFixed(2)
+                            : item.value;
+
+                        return (
+                          <li key={`${item.feature}-${item.value}`} className="space-y-2">
+                            <div className="flex items-center justify-between gap-3 text-sm">
+                              <span className="font-medium text-slate-700">
+                                {item.feature} = {formattedValue}
+                              </span>
+                              <span className={isPositive ? "text-indigo-600" : "text-rose-600"}>
+                                {isPositive ? "+" : "-"}
+                                {Math.abs(item.shap_value).toFixed(2)}
+                              </span>
+                            </div>
+                            <div className="h-3 rounded-full bg-slate-100">
+                              <div className={`h-3 rounded-full ${tone}`} style={{ width: `${widthPercent}%` }} />
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                ) : (
+                  <section>
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                        Explainability
+                      </p>
+                      <h3 className="text-2xl font-semibold text-slate-900">What influenced the estimate</h3>
+                    </div>
+                    <p className="mt-6 text-sm text-slate-500">
+                      SHAP contributions are not available for this prediction.
+                    </p>
+                  </section>
+                )}
+              </div>
+              {result.explainability_error || result.llm_error ? (
+                <div className="mt-6 border-t border-slate-100 pt-6">
+                  <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-700">
+                    {result.explainability_error ? `Explainability: ${result.explainability_error}` : null}
+                    {result.explainability_error && result.llm_error ? " " : null}
+                    {result.llm_error ? `Interpretation: ${result.llm_error}` : null}
+                  </div>
+                </div>
+              ) : null}
+            </section>
+          ) : null}
+        </section>
       </main>
     </div>
   );
