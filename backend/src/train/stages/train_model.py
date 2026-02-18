@@ -18,7 +18,6 @@ if __package__ in (None, ""):
 
 from insurance_pricing import MODELS_DIR
 from train.settings import get_scripts_settings
-from train.stages.ag_metrics import MAPE_SCORER
 
 SETTINGS = get_scripts_settings()
 TRAIN_PATH = SETTINGS.train_data_path
@@ -26,6 +25,7 @@ PREDICTOR_DIR_NAME = "ag_insurance"
 DEFAULT_TIME_LIMIT = SETTINGS.default_time_limit
 DEFAULT_NUM_BAG_FOLDS = SETTINGS.default_num_bag_folds
 DEFAULT_NUM_BAG_SETS = SETTINGS.default_num_bag_sets
+DEFAULT_EVAL_METRIC = "mape"
 
 TARGET_COLUMN = "charges"
 
@@ -92,7 +92,7 @@ def train_and_save(
 ) -> Path:
     train_path = train_path or TRAIN_PATH
     model_dir = model_dir or (MODELS_DIR / PREDICTOR_DIR_NAME)
-    eval_metric = eval_metric if eval_metric is not None else MAPE_SCORER
+    eval_metric = eval_metric if eval_metric is not None else DEFAULT_EVAL_METRIC
     hyperparameters = (
         hyperparameters if hyperparameters is not None else REGULARIZED_HYPERPARAMETERS
     )

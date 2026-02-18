@@ -26,7 +26,6 @@ src/train/
     ├── prepare_data.py
     ├── train_model.py
     ├── evaluate_model.py
-    ├── ag_metrics.py
     └── run_eda.py
 ```
 
@@ -58,7 +57,6 @@ From `backend/`:
 uv run python src/train/stages/prepare_data.py
 uv run python src/train/stages/train_model.py
 uv run python src/train/stages/evaluate_model.py
-uv run python src/train/stages/ag_metrics.py
 uv run python src/train/stages/run_eda.py
 ```
 
@@ -114,20 +112,6 @@ Reads:
 - `backend/data/test.csv`
 
 Writes:
-- `backend/notebooks/evaluation_report.md`
-
-### `ag_metrics.py`
-
-Purpose:
-- defines reusable custom metrics (MAPE/SMAPE)
-- executable wrapper to run evaluation with CLI args
-
-Reads (when executed):
-- `backend/models/ag_insurance/`
-- `backend/models/feature_transformer.joblib`
-- `backend/data/test.csv`
-
-Writes (when executed):
 - `backend/notebooks/evaluation_report.md`
 
 ## Settings And Environment Variables

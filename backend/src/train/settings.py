@@ -8,6 +8,25 @@ from pydantic import BaseModel
 
 from insurance_pricing import DATA_DIR, MODELS_DIR, NOTEBOOKS_DIR
 
+PACKAGE_ENV_FILE = Path(__file__).resolve().parent / ".env"
+
+
+def _read_env_file(path: Path) -> dict[str, str]:
+    if not path.exists():
+        return {}
+
+    loaded: dict[str, str] = {}
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key:
+            loaded[key] = value
+    return loaded
+
 
 class ScriptsSettings(BaseModel):
     openai_api_key: str | None = None
@@ -25,44 +44,93 @@ class ScriptsSettings(BaseModel):
 
     @classmethod
     def from_env(cls) -> ScriptsSettings:
+        file_env = _read_env_file(PACKAGE_ENV_FILE)
+        # Some training/evaluation stages read OpenAI settings directly from
+        # process environment. Mirror .env values into os.environ so those
+        # stages work without requiring code changes.
+        for key in ("OPENAI_API_KEY", "OPENAI_MODEL", "OPENAI_TIMEOUT_SECONDS"):
+            if key in file_env and key not in os.environ:
+                os.environ[key] = file_env[key]
+
+        def env_optional(name: str) -> str | None:
+            # Real environment variables take precedence over .env values.
+            return os.getenv(name, file_env.get(name))
+
+        def env_required(name: str, default: str) -> str:
+            value = os.getenv(name, file_env.get(name, default))
+            return value if value is not None else default
+
         return cls(
-            openai_api_key=os.getenv("OPENAI_API_KEY"),
+            openai_api_key=env_optional("OPENAI_API_KEY"),
             source_data_path=Path(
-                os.getenv("SOURCE_DATA_PATH", str(DATA_DIR / "source.csv")),
+                env_required(
+                    "SOURCE_DATA_PATH",
+                    str(cls.model_fields["source_data_path"].default),
+                ),
             ),
             train_data_path=Path(
-                os.getenv("TRAIN_DATA_PATH", str(DATA_DIR / "train.csv")),
+                env_required(
+                    "TRAIN_DATA_PATH",
+                    str(cls.model_fields["train_data_path"].default),
+                ),
             ),
             test_data_path=Path(
-                os.getenv("TEST_DATA_PATH", str(DATA_DIR / "test.csv")),
+                env_required(
+                    "TEST_DATA_PATH",
+                    str(cls.model_fields["test_data_path"].default),
+                ),
             ),
             transformer_path=Path(
-                os.getenv(
+                env_required(
                     "TRANSFORMER_PATH",
-                    os.getenv(
+                    env_required(
                         "TRANSFORM_PARAMS_PATH",
-                        str(MODELS_DIR / "feature_transformer.joblib"),
+                        str(cls.model_fields["transformer_path"].default),
                     ),
                 ),
             ),
             predictor_dir=Path(
-                os.getenv("PREDICTOR_DIR", str(MODELS_DIR / "ag_insurance")),
+                env_required(
+                    "PREDICTOR_DIR",
+                    str(cls.model_fields["predictor_dir"].default),
+                ),
             ),
             evaluation_report_path=Path(
-                os.getenv(
+                env_required(
                     "EVALUATION_REPORT_PATH",
-                    str(NOTEBOOKS_DIR / "evaluation_report.md"),
+                    str(cls.model_fields["evaluation_report_path"].default),
                 ),
             ),
             eda_report_path=Path(
-                os.getenv("EDA_REPORT_PATH", str(NOTEBOOKS_DIR / "eda_report.md")),
+                env_required(
+                    "EDA_REPORT_PATH",
+                    str(cls.model_fields["eda_report_path"].default),
+                ),
             ),
             eda_figures_dir=Path(
-                os.getenv("EDA_FIGURES_DIR", str(NOTEBOOKS_DIR / "_eda_figures")),
+                env_required(
+                    "EDA_FIGURES_DIR",
+                    str(cls.model_fields["eda_figures_dir"].default),
+                ),
             ),
-            default_time_limit=int(os.getenv("TIME_LIMIT", "300")),
-            default_num_bag_folds=int(os.getenv("NUM_BAG_FOLDS", "5")),
-            default_num_bag_sets=int(os.getenv("NUM_BAG_SETS", "1")),
+            default_time_limit=int(
+                env_required(
+                    "TIME_LIMIT",
+                    str(cls.model_fields["default_time_limit"].default),
+                ),
+            ),
+            default_num_bag_folds=int(
+                env_required(
+                    "NUM_BAG_FOLDS",
+                    str(cls.model_fields["default_num_bag_folds"].default),
+                ),
+            ),
+            default_num_bag_sets=int(
+                env_required(
+                    "NUM_BAG_SETS",
+                    str(cls.model_fields["default_num_bag_sets"].default),
+                ),
+            ),
         )
 
 
