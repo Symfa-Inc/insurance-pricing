@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from insurance_pricing.config import get_settings
+from insurance_pricing.settings import get_settings
 
 router = APIRouter(tags=["health"])
 

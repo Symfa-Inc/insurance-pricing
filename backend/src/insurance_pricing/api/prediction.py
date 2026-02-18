@@ -1,10 +1,10 @@
 from fastapi import HTTPException, Request, status
 
-from insurance_pricing.config import get_settings
 from insurance_pricing.schemas.predict import PredictRequest, PredictResponse
 from insurance_pricing.services.explainability import compute_shap_contributions
 from insurance_pricing.services.llm_interpretation import interpret_shap
 from insurance_pricing.services.predictor import check_extrapolation, predict_charges
+from insurance_pricing.settings import get_settings
 
 
 def _format_extrapolation_warning(raw_warning: str) -> str:

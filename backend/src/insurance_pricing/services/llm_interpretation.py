@@ -6,8 +6,8 @@ from typing import Any, Literal
 from openai import OpenAI
 from pydantic import BaseModel, ConfigDict, Field
 
-from insurance_pricing.config import Settings
 from insurance_pricing.schemas.predict import InterpretationPayload, ShapPayload
+from insurance_pricing.settings import Settings
 
 
 class _LLMTopFeature(BaseModel):

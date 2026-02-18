@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from insurance_pricing.api.router import api_router
-from insurance_pricing.config import get_settings
 from insurance_pricing.lifespan import create_lifespan
+from insurance_pricing.settings import get_settings
 
 settings = get_settings()
 

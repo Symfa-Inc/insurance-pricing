@@ -6,8 +6,8 @@ from pathlib import Path
 
 from fastapi import FastAPI
 
-from insurance_pricing.config import Settings
 from insurance_pricing.services.model_loader import load_model, load_transformer
+from insurance_pricing.settings import Settings
 
 
 def create_lifespan(
