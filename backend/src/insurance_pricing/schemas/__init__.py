@@ -1,3 +1,17 @@
-from insurance_pricing.schemas.predict import PredictRequest, PredictResponse
+from insurance_pricing.schemas.predict import (
+    InterpretationPayload,
+    PredictRequest,
+    PredictResponse,
+    ShapContribution,
+    ShapPayload,
+    TopFeatureDirection,
+)
 
-__all__ = ["PredictRequest", "PredictResponse"]
+__all__ = [
+    "InterpretationPayload",
+    "PredictRequest",
+    "PredictResponse",
+    "ShapContribution",
+    "ShapPayload",
+    "TopFeatureDirection",
+]

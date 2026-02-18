@@ -11,6 +11,7 @@ interface FeaturePanelProps {
   onSubmit: () => void;
   isSubmitting: boolean;
   submitDisabled?: boolean;
+  errorMessage?: string | null;
 }
 
 export function FeaturePanel({
@@ -21,6 +22,7 @@ export function FeaturePanel({
   onSubmit,
   isSubmitting,
   submitDisabled = false,
+  errorMessage = null,
 }: FeaturePanelProps) {
   return (
     <aside className="w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:w-72">
@@ -72,6 +74,7 @@ export function FeaturePanel({
       >
         {isSubmitting ? "Estimating..." : "Estimate"}
       </button>
+      {errorMessage ? <p className="mt-3 text-xs font-medium text-rose-600">{errorMessage}</p> : null}
     </aside>
   );
 }

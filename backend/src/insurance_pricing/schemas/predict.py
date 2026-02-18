@@ -16,7 +16,37 @@ class PredictRequest(BaseModel):
     region: Region
 
 
+class ShapContribution(BaseModel):
+    feature: str
+    value: str | int | float
+    shap_value: float
+    abs_shap_value: float
+
+
+class ShapPayload(BaseModel):
+    base_value: float
+    contributions: list[ShapContribution]
+    top_k: int
+
+
+class TopFeatureDirection(BaseModel):
+    feature: str
+    direction: Literal["increases", "decreases", "mixed"]
+    strength: Literal["high", "medium", "low"]
+
+
+class InterpretationPayload(BaseModel):
+    headline: str
+    bullets: list[str] = Field(default_factory=list)
+    caveats: list[str] = Field(default_factory=list)
+    top_features: list[TopFeatureDirection] = Field(default_factory=list)
+
+
 class PredictResponse(BaseModel):
     charges: float
     model_version: str | None = None
     extrapolation_warnings: list[str] = Field(default_factory=list)
+    shap: ShapPayload | None = None
+    interpretation: InterpretationPayload | None = None
+    explainability_error: str | None = None
+    llm_error: str | None = None

@@ -16,6 +16,7 @@ interface StatusSummaryProps {
   summary: string;
   value: number | null;
   modelVersion?: string;
+  embedded?: boolean;
 }
 
 export function StatusSummary({
@@ -23,9 +24,11 @@ export function StatusSummary({
   summary,
   value,
   modelVersion,
+  embedded = false,
 }: StatusSummaryProps) {
+  const containerClass = embedded ? "" : "rounded-2xl border border-slate-200 bg-white p-8 shadow-sm";
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+    <section className={containerClass}>
       <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{headline}</p>

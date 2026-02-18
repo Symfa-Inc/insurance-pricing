@@ -15,6 +15,7 @@ REGION_MAP = {
     "southeast": 2.0,
     "southwest": 3.0,
 }
+RAW_FEATURE_ORDER = ("age", "sex", "bmi", "children", "smoker", "region")
 
 
 def preprocess_features(payload: PredictRequest) -> np.ndarray:
@@ -36,11 +37,11 @@ def check_extrapolation(
     payload: PredictRequest,
     transformer: Any,
 ) -> list[str]:
-    feature_frame = _payload_to_frame(payload)
+    feature_frame = payload_to_frame(payload)
     return list(transformer.check_extrapolation(feature_frame))
 
 
-def _payload_to_frame(payload: PredictRequest) -> pd.DataFrame:
+def payload_to_frame(payload: PredictRequest) -> pd.DataFrame:
     return pd.DataFrame(
         [
             {
@@ -60,7 +61,7 @@ def predict_charges(
     payload: PredictRequest,
     transformer: Any,
 ) -> float:
-    feature_frame = _payload_to_frame(payload)
+    feature_frame = payload_to_frame(payload)
     transformed_features = transformer.transform_features(feature_frame)
     transformed_prediction = model.predict(transformed_features)
     charges = transformer.inverse_transform_target(transformed_prediction)
