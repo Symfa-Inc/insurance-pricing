@@ -6,10 +6,6 @@ from insurance_pricing.schemas.predict import (
     ShapPayload,
     TopFeatureDirection,
 )
-from insurance_pricing.schemas.reports import (
-    EdaReportResponse,
-    EvaluationReportResponse,
-)
 
 __all__ = [
     "InterpretationPayload",
@@ -18,6 +14,4 @@ __all__ = [
     "ShapContribution",
     "ShapPayload",
     "TopFeatureDirection",
-    "EdaReportResponse",
-    "EvaluationReportResponse",
 ]

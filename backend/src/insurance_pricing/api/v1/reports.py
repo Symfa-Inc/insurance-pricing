@@ -6,11 +6,6 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
-from insurance_pricing.schemas.reports import (
-    EdaReportResponse,
-    EvaluationReportResponse,
-)
-
 router = APIRouter(prefix="/reports", tags=["reports"])
 
 NOTEBOOKS_DIR = Path(__file__).resolve().parents[4] / "notebooks"
@@ -53,23 +48,6 @@ def _read_markdown_or_404(path: Path) -> str:
         return path.read_text(encoding="utf-8")
     except FileNotFoundError as error:
         raise HTTPException(status_code=404, detail="Report not found") from error
-
-
-@router.get("/eda", response_model=EdaReportResponse)
-async def get_eda_report() -> EdaReportResponse:
-    markdown = _read_markdown_or_404(EDA_REPORT_PATH)
-    rewritten_markdown = _rewrite_eda_markdown_images(markdown)
-    return EdaReportResponse(
-        title="EDA Report",
-        markdown=rewritten_markdown,
-        assets_base_url=EDA_ASSETS_BASE_URL,
-    )
-
-
-@router.get("/evaluation", response_model=EvaluationReportResponse)
-async def get_evaluation_report() -> EvaluationReportResponse:
-    markdown = _read_markdown_or_404(EVALUATION_REPORT_PATH)
-    return EvaluationReportResponse(title="Evaluation Report", markdown=markdown)
 
 
 @router.get("/eda/assets/{path:path}")

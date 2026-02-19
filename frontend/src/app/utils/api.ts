@@ -12,27 +12,6 @@ function isPredictResponse(value: unknown): value is PredictResponse {
   return typeof maybeResponse.charges === "number";
 }
 
-function isEdaReportResponse(value: unknown): value is EdaReportResponse {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const maybeResponse = value as Partial<EdaReportResponse>;
-  return (
-    typeof maybeResponse.title === "string" &&
-    typeof maybeResponse.markdown === "string" &&
-    typeof maybeResponse.assets_base_url === "string"
-  );
-}
-
-function isEvaluationReportResponse(value: unknown): value is EvaluationReportResponse {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const maybeResponse = value as Partial<EvaluationReportResponse>;
-  return typeof maybeResponse.title === "string" && typeof maybeResponse.markdown === "string";
-}
 
 export async function predictInsurancePricing(
   payload: PredictRequest,

@@ -9,10 +9,8 @@ import {
   type FeatureSchema,
 } from "@/app/config/features";
 import type { PredictRequest, PredictResponse } from "@/app/types/api";
-import type { EdaReportResponse, EvaluationReportResponse } from "@/app/types/reports";
-import { getEdaReport, getEvaluationReport, predictInsurancePricing } from "@/app/utils/api";
+import { predictInsurancePricing } from "@/app/utils/api";
 import { FeaturePanel } from "@/app/ui/FeaturePanel";
-import { ReportCard } from "@/app/ui/ReportCard";
 import { formatCurrencyUSD } from "@/app/ui/StatusSummary";
 
 function buildPredictionSummary(payload: PredictRequest | null, response: PredictResponse | null): string {
@@ -109,10 +107,6 @@ export default function Home() {
   const [lastSubmittedPayload, setLastSubmittedPayload] = useState<PredictRequest | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [edaReport, setEdaReport] = useState<EdaReportResponse | null>(null);
-  const [evaluationReport, setEvaluationReport] = useState<EvaluationReportResponse | null>(null);
-  const [reportsLoading, setReportsLoading] = useState(true);
-  const [reportsError, setReportsError] = useState<string | null>(null);
 
   const summaryText = useMemo(
     () => buildPredictionSummary(lastSubmittedPayload, result),
@@ -127,34 +121,6 @@ export default function Home() {
       [id]: nextValue,
     }));
   };
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadReports() {
-      try {
-        setReportsLoading(true);
-        setReportsError(null);
-        const [eda, evaluation] = await Promise.all([
-          getEdaReport(controller.signal),
-          getEvaluationReport(controller.signal),
-        ]);
-        setEdaReport(eda);
-        setEvaluationReport(evaluation);
-      } catch {
-        if (!controller.signal.aborted) {
-          setReportsError("Unable to load reports right now.");
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setReportsLoading(false);
-        }
-      }
-    }
-
-    void loadReports();
-    return () => controller.abort();
-  }, []);
 
   const handleSubmit = async () => {
     setError(null);
@@ -198,32 +164,6 @@ export default function Home() {
       }}
     >
       <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
-        <section className="space-y-8">
-          {reportsLoading ? (
-            <article className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-              <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
-              <div className="mt-4 h-8 w-48 animate-pulse rounded bg-slate-200" />
-              <div className="mt-6 space-y-3">
-                <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
-                <div className="h-3 w-5/6 animate-pulse rounded bg-slate-100" />
-                <div className="h-3 w-4/6 animate-pulse rounded bg-slate-100" />
-              </div>
-            </article>
-          ) : null}
-          {reportsError ? (
-            <article className="rounded-2xl border border-rose-200 bg-rose-50 p-8 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-rose-400">Reports</p>
-              <h2 className="mt-2 text-2xl font-semibold text-rose-700">Unable to load reports</h2>
-              <p className="mt-3 text-sm text-rose-600">{reportsError}</p>
-            </article>
-          ) : null}
-          {!reportsLoading && !reportsError && edaReport ? (
-            <ReportCard title={edaReport.title} markdown={edaReport.markdown} />
-          ) : null}
-          {!reportsLoading && !reportsError && evaluationReport ? (
-            <ReportCard title={evaluationReport.title} markdown={evaluationReport.markdown} />
-          ) : null}
-        </section>
 
         <section className={predictionSectionClass}>
           <div
