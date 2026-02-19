@@ -34,7 +34,7 @@ export function FeaturePanel({
             htmlFor={feature.id}
             className="block space-y-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-3"
           >
-            <span className="text-sm font-medium text-slate-700">
+            <span className="block text-sm font-medium text-slate-700">
               {feature.label}
             </span>
             {feature.type === "number" ? (
@@ -44,14 +44,14 @@ export function FeaturePanel({
                 value={values[feature.id]}
                 placeholder={feature.placeholder}
                 onChange={(event) => onChange(feature.id, event.target.value)}
-                className="flex-1 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 tabular-nums focus:border-slate-400 focus:outline-none"
+                className="block w-full rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 tabular-nums focus:border-slate-400 focus:outline-none"
               />
             ) : (
               <select
                 id={feature.id}
                 value={values[feature.id]}
                 onChange={(event) => onChange(feature.id, event.target.value)}
-                className="w-full rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+                className="block w-full rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
               >
                 {feature.options.map((option) => (
                   <option key={option} value={option}>
