@@ -35,7 +35,12 @@ export function ResultsBubble({ result, summary, className = "" }: ResultsBubble
 
       <div className="mt-6 border-t border-slate-100 pt-6">
         {result.shap?.contributions?.length ? (
-          <ShapChart contributions={result.shap.contributions} embedded />
+          <ShapChart
+            contributions={result.shap.contributions}
+            baseValue={result.shap.base_value}
+            predictedValue={result.charges}
+            embedded
+          />
         ) : (
           <section>
             <div className="space-y-2">
