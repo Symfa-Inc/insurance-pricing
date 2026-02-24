@@ -114,7 +114,7 @@ def _llm_interpretation(metrics: dict[str, float]) -> str:
             "OPENAI_API_KEY is required for interpretation generation.",
         )
 
-    model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    model = os.getenv("OPENAI_MODEL", "gpt-5-nano-2025-08-07")
     timeout_seconds = float(os.getenv("OPENAI_TIMEOUT_SECONDS", "15"))
     client = OpenAI(api_key=api_key, timeout=timeout_seconds)
 

@@ -89,7 +89,7 @@ def get_llm_interpretation(
                 "Content-Type": "application/json",
             },
             json={
-                "model": "gpt-4o-mini",
+                "model": "gpt-5-nano-2025-08-07",
                 "messages": [
                     {
                         "role": "system",
