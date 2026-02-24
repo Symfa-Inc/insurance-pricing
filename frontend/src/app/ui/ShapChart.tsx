@@ -42,8 +42,8 @@ export function ShapChart({
         {contributions.map((item) => {
           const widthPercent = Math.max(3, (Math.abs(item.shap_value) / maxAbs) * 50);
           const isPositive = item.shap_value >= 0;
-          const valueTextClass = isPositive ? "font-semibold text-rose-600" : "font-semibold text-sky-600";
-          const barClass = isPositive ? "left-1/2 bg-rose-500" : "right-1/2 bg-sky-500";
+          const valueTextClass = isPositive ? "font-semibold text-indigo-600" : "font-semibold text-rose-600";
+          const barClass = isPositive ? "left-1/2 bg-indigo-500" : "right-1/2 bg-rose-500";
 
           return (
             <li key={`${item.feature}-${item.value}`} className="space-y-2">
@@ -80,9 +80,7 @@ export function ShapChart({
           </p>
         </div>
       ) : null}
-      <p className="mt-3 text-xs text-slate-500">
-        Positive (red) pushes the estimate up; negative (blue) pulls it down.
-      </p>
+      <p className="mt-3 text-xs text-slate-500">Positive (indigo) pushes the estimate up; negative (rose) pulls it down.</p>
     </section>
   );
 }
