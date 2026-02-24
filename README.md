@@ -1,155 +1,177 @@
 <div align="center">
 
-<img src=".assets/logo.png" width="100" alt="Insurance Pricing Logo">
+<img src=".assets/logo.png" width="100" alt="Project Logo">
 
-# 💰 Insurance Premium Pricing
+# Insurance Pricing Assistant
 
-[![Python 3.13](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/downloads/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6.svg)](https://www.typescriptlang.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.128-009688.svg)](https://fastapi.tiangolo.com/)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org/)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.6-F7931E.svg?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
-[![SHAP](https://img.shields.io/badge/SHAP-0.44-000000.svg)](https://shap.readthedocs.io/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
+[![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
+[![TypeScript 5+](https://img.shields.io/badge/TypeScript-5%2B-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Framework-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-App-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![AutoGluon](https://img.shields.io/badge/AutoGluon-Tabular-2C7BE5)](https://auto.gluon.ai/stable/)
+[![SHAP](https://img.shields.io/badge/SHAP-Explainability-111111)](https://shap.readthedocs.io/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-LLM-412991?logo=openai&logoColor=white)](https://platform.openai.com/)
+[![Docker](https://img.shields.io/badge/Docker-Optional-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 
-**ML service for predicting insurance premiums based on customer input data with explainability (feature importance, SHAP) and executive summary for the user.**
+**A full-stack ML application for estimating annual insurance charges with transparent, human-readable prediction explanations.**
 
-🔗 **Live Demo**: [insurance-pricing-demo.symfa.com](https://insurance-pricing-demo-placeholder.vercel.app/)
+[Live Demo (Optional)](#) • [API Docs](http://localhost:8000/docs) • [GitHub Repository](https://github.com/your-org/insurance-pricing-assistant)
 
 </div>
 
+## Overview
 
-## 📋 Overview
+Insurance Pricing Assistant predicts annual insurance charges from customer profile inputs through a FastAPI backend and a modern Next.js frontend.  
+Beyond returning a numeric estimate, each prediction includes model transparency signals (SHAP feature contributions) and an LLM-generated interpretation so users can understand the likely drivers behind the result.
 
-This project demonstrates a transparent approach to insurance pricing using machine learning. Based on the [US Health Insurance Dataset](https://www.kaggle.com/datasets/teertha/ushealthinsurancedataset) from Kaggle, the system predicts premiums while prioritizing explainability. Instead of a black-box output, it provides a detailed breakdown of how individual customer factors—such as age, BMI, and region—drive the calculated cost, helping business users understand the "why" behind every price.
+The project also includes an evaluation stage that generates Markdown artifacts (`eda_report.md` and `evaluation_report.md`) for reproducible model analysis and communication.
 
-## 🎯 Problem Statement
+This repository is intended as an ML demonstration system and product prototype, not financial, underwriting, or actuarial advice.
 
-The goal is to build a predictive model that estimates insurance premiums based on customer characteristics, providing:
+## Key Features
 
-- Accurate premium predictions based on customer attributes
-- Explainability via feature importance and SHAP values
-- Executive summary generation in human-readable language
-- Interactive parameter adjustment with real-time updates
+- **Insurance Charges Prediction:** AutoGluon tabular regression for annual charges estimation.
+- **SHAP-Based Explainability:** Per-prediction feature contribution outputs.
+- **LLM-Powered Interpretation:** Human-readable explanation of model behavior for each prediction.
+- **Model Evaluation Reports:** R², MAPE, and SMAPE reporting with business-oriented interpretation.
+- **EDA Report Generation:** Exploratory data analysis report generation in Markdown.
+- **Modern Interactive UI:** Next.js + React + Tailwind user interface for interactive scoring.
+- **API-First Backend:** FastAPI service designed for frontend and programmatic clients.
 
-## 📁 Project Structure
+## Tech Stack
 
+| Category | Technologies |
+|---|---|
+| Backend | Python 3.13, FastAPI, Pydantic, Uvicorn |
+| Frontend | TypeScript, Next.js, React, Tailwind CSS |
+| ML | AutoGluon (TabularPredictor), scikit-learn |
+| Explainability | SHAP |
+| LLM | OpenAI API (structured interpretation generation) |
+| Data Processing | pandas, NumPy |
+| Package Management | uv (Python), pnpm (Node.js) |
+| Deployment | Local runtime, Docker-optional workflows |
+
+## Architecture
+
+```text
++--------------------+
+| Frontend (Next.js) |
++---------+----------+
+          |
+          v
++--------------------+
+| FastAPI API Layer  |
++---------+----------+
+          |
+          v
++-----------------------------+
+| Model Artifact (AutoGluon)  |
++---------+-------------------+
+          |
+          v
++--------------------+
+| SHAP Contributions |
++---------+----------+
+          |
+          v
++------------------------------+
+| OpenAI Interpretation Layer  |
++------------------------------+
 ```
-insurance-pricing/
-├── backend/                        # 🐍 Python Backend (UV workspace member)
-│   ├── src/insurance_pricing/      # FastAPI application
-│   │   ├── __init__.py
-│   │   └── main.py                 # API endpoints
-│   ├── models/                     # Trained ML model artifacts
-│   ├── notebooks/                  # Jupyter notebooks (EDA, experiments)
-│   ├── scripts/                    # Training & preprocessing scripts
-│   ├── data/                       # Datasets
-│   │   └── source.csv
-│   └── pyproject.toml              # Backend dependencies
-│
-├── frontend/                       # ⚛️ Next.js Frontend
-│   ├── src/app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   └── globals.css
-│   └── package.json
-│
-├── pyproject.toml                  # UV workspace definition
-├── uv.lock                         # Lockfile
-├── .pre-commit-config.yaml         # Code quality hooks
+
+## Evaluation and Reporting
+
+The training/evaluation pipeline includes report generation for both technical and business-facing analysis:
+
+- `ag_metrics.py`-style metric logic is implemented in `backend/src/train/stages/evaluate_model.py`.
+- `backend/src/train/stages/evaluate_model.py` computes regression quality metrics.
+- Metrics include **R²**, **MAPE**, and **SMAPE**.
+- The evaluation stage uses an LLM step to generate plain-language interpretation of metric outcomes.
+- `backend/src/train/stages/run_eda.py` produces exploratory data insights.
+- Outputs are generated as Markdown files:
+  - `backend/notebooks/eda_report.md`
+  - `backend/notebooks/evaluation_report.md`
+
+## Project Structure
+
+```text
+insurance-pricing-assistant/
+├── backend/
+│   ├── src/insurance_pricing/
+│   ├── models/
+│   ├── data/
+│   ├── notebooks/
+│   └── pyproject.toml
+├── frontend/
+├── Dockerfile
 └── README.md
 ```
 
-## 📊 Dataset
+> Note: If Docker is not used in your local setup yet, treat `Dockerfile` as an optional deployment artifact placeholder.
 
-The dataset contains health insurance records with the following features:
-
-### Customer Demographics
-| Feature | Description |
-|---------|-------------|
-| `age` | Age of the primary beneficiary |
-| `sex` | Gender (male/female) |
-| `bmi` | Body mass index |
-| `children` | Number of dependents covered |
-| `smoker` | Smoking status (yes/no) |
-| `region` | Residential area in the US |
-
-### Target Variable
-| Feature | Description |
-|---------|-------------|
-| `charges` | **Target** - Individual medical costs billed by insurance |
-
-## 🛠️ Tech Stack
-
-### Backend
-- **Python 3.13+**
-- **FastAPI** - Modern, high-performance web framework
-- **Pydantic** - Data validation
-- **uvicorn** - ASGI server
-
-### Frontend
-- **Next.js 16** - React framework with SSR
-- **TypeScript** - Type-safe JavaScript
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **React 19**
-
-### ML & Data Science
-- **pandas** - Data manipulation
-- **scikit-learn** - Machine learning
-- **SHAP** - Model explainability
-
-### Development
-- **uv** - Fast Python package manager
-- **pnpm** - Fast Node.js package manager
-- **pre-commit** - Git hooks for code quality
-- **ruff** - Linter and formatter
-- **mypy** - Static type checker
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
 - Python 3.13+
-- Node.js 20+
-- [pnpm](https://pnpm.io/) (fast and efficient Node.js package manager)
-- [uv](https://github.com/astral-sh/uv) (recommended for Python)
+- Node.js 18+
+- [uv](https://github.com/astral-sh/uv)
+- [pnpm](https://pnpm.io/)
+- OpenAI API key
 
 ### Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Symfa-Inc/insurance-pricing.git
-   cd insurance-pricing
-   ```
-
-2. **Install Python dependencies:**
-   ```bash
-   uv sync
-   ```
-
-3. **Install frontend dependencies:**
-   ```bash
-   cd frontend
-   pnpm install
-   ```
-
-### Running the Application
-
-**Backend (FastAPI):**
 ```bash
-uv run uvicorn insurance_pricing.main:app --reload
-```
-API will be available at: http://localhost:8000
-API docs at: http://localhost:8000/docs
+# Clone and enter project root
+git clone https://github.com/your-org/insurance-pricing-assistant.git
+cd insurance-pricing-assistant
 
-**Frontend (Next.js):**
+# Install Python dependencies (workspace)
+uv sync
+
+# Install frontend dependencies
+cd frontend
+pnpm install
+cd ..
+```
+
+### Configuration
+
+Set required environment variables before running:
+
+```bash
+export OPENAI_API_KEY="your_openai_api_key"
+```
+
+Optional model artifact overrides:
+
+```bash
+export MODEL_PATH="backend/models/ag_insurance"
+export TRANSFORMER_PATH="backend/models/feature_transformer.joblib"
+```
+
+### Running Locally
+
+Backend:
+
+```bash
+uvicorn insurance_pricing.app.main:app --reload
+```
+
+Frontend:
+
 ```bash
 cd frontend
 pnpm dev
 ```
-Frontend will be available at: http://localhost:3000
 
-## 🔗 References
+Local URLs:
 
-- [US Health Insurance Dataset on Kaggle](https://www.kaggle.com/datasets/teertha/ushealthinsurancedataset)
-- [SHAP Documentation](https://shap.readthedocs.io/)
+- API docs: http://localhost:8000/docs
+- Frontend app: http://localhost:3000
+
+## License
+
+This project is licensed under the Apache License 2.0.  
+See `LICENSE` for details.
