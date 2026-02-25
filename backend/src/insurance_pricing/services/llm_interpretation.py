@@ -84,6 +84,7 @@ def interpret_shap(
         "You explain one insurance premium prediction. "
         "Focus on the top 3 drivers by absolute SHAP value. "
         "State which features increased or decreased this estimate. "
+        "Do not use any markdown or HTML tags. "
         "Avoid causal language; use phrases such as 'associated with' or "
         "'contributed to this estimate'. Keep the output concise. "
         "Include caveats that this is a local, model-dependent explanation. "
