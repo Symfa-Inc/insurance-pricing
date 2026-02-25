@@ -3,8 +3,6 @@ import type { ShapContribution } from "@/app/types/api";
 interface ShapChartProps {
   contributions: ShapContribution[];
   embedded?: boolean;
-  baseValue?: number;
-  predictedValue?: number;
 }
 
 function formatFeatureValue(value: string | number): string {
@@ -14,17 +12,11 @@ function formatFeatureValue(value: string | number): string {
   return value;
 }
 
-export function ShapChart({
-  contributions,
-  embedded = false,
-  baseValue,
-  predictedValue,
-}: ShapChartProps) {
+export function ShapChart({ contributions, embedded = false }: ShapChartProps) {
   if (contributions.length === 0) {
     return null;
   }
 
-  const sumImpacts = contributions.reduce((sum, item) => sum + item.shap_value, 0);
   const maxAbs = Math.max(...contributions.map((item) => Math.abs(item.shap_value)), 1e-9);
   const containerClass = embedded ? "" : "rounded-2xl border border-slate-200 bg-white p-8 shadow-sm";
 
@@ -34,16 +26,15 @@ export function ShapChart({
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Explainability</p>
         <h3 className="text-2xl font-semibold text-slate-900">What influenced the estimate</h3>
       </div>
-      <p className="mt-4 text-sm text-slate-600">
-        Feature impacts are centered at zero. Positive values increase the estimate; negative values decrease it.
-      </p>
 
       <ul className="mt-6 space-y-4">
         {contributions.map((item) => {
-          const widthPercent = Math.max(3, (Math.abs(item.shap_value) / maxAbs) * 50);
+          const widthPercent = Math.max(1.5, (Math.abs(item.shap_value) / maxAbs) * 50);
           const isPositive = item.shap_value >= 0;
-          const valueTextClass = isPositive ? "font-semibold text-indigo-600" : "font-semibold text-rose-600";
-          const barClass = isPositive ? "left-1/2 bg-indigo-500" : "right-1/2 bg-rose-500";
+          const tone = isPositive
+            ? "bg-gradient-to-r from-indigo-500 to-indigo-300 text-indigo-700"
+            : "bg-gradient-to-l from-rose-500 to-rose-300 text-rose-700";
+          const directionLabel = isPositive ? "adds to estimate" : "reduces estimate";
 
           return (
             <li key={`${item.feature}-${item.value}`} className="space-y-2">
@@ -51,36 +42,24 @@ export function ShapChart({
                 <span className="font-medium text-slate-700">
                   {item.feature} = {formatFeatureValue(item.value)}
                 </span>
-                <span className={`tabular-nums ${valueTextClass}`}>
-                  {item.shap_value >= 0 ? "+" : ""}
-                  {item.shap_value.toFixed(2)} {isPositive ? "↑" : "↓"}
+                <span className={`text-xs ${isPositive ? "text-indigo-600" : "text-rose-600"}`}>
+                  {isPositive ? "+" : "-"}
+                  {Math.abs(item.shap_value).toFixed(2)} ({directionLabel})
                 </span>
               </div>
-              <div className="relative flex h-6 items-center">
-                <div className="absolute left-1/2 h-4 w-px -translate-x-px bg-slate-300" />
+              <div className="relative h-5 overflow-hidden rounded-full bg-slate-100">
+                <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-slate-300" />
                 <div
-                  className={`absolute top-1/2 h-4 -translate-y-1/2 rounded ${barClass}`}
-                  style={{
-                    width: `${widthPercent}%`,
-                    ...(isPositive ? { left: "50%" } : { right: "50%" }),
-                  }}
+                  className={`absolute inset-y-0 ${tone} ${
+                    isPositive ? "left-1/2 rounded-r-full" : "right-1/2 rounded-l-full"
+                  }`}
+                  style={{ width: `${widthPercent}%` }}
                 />
               </div>
             </li>
           );
         })}
       </ul>
-
-      {baseValue !== undefined && predictedValue !== undefined ? (
-        <div className="mt-5 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3">
-          <p className="text-sm font-medium text-slate-700">
-            <span className="tabular-nums">{baseValue.toFixed(2)}</span> baseline +{" "}
-            <span className="tabular-nums">{sumImpacts.toFixed(2)}</span> (from features) ={" "}
-            <strong className="tabular-nums text-indigo-700">{predictedValue.toFixed(2)} estimate</strong>
-          </p>
-        </div>
-      ) : null}
-      <p className="mt-3 text-xs text-slate-500">Positive (indigo) pushes the estimate up; negative (rose) pulls it down.</p>
     </section>
   );
 }
