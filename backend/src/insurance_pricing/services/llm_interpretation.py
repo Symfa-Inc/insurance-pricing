@@ -1,71 +1,75 @@
 from __future__ import annotations
 
 import json
-from typing import Literal
+import logging
 
 from openai import OpenAI
-from pydantic import BaseModel, ConfigDict, Field
 
 from insurance_pricing.schemas.predict import InterpretationPayload, ShapPayload
 from insurance_pricing.settings import Settings
 
-
-class _LLMTopFeature(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    feature: str
-    direction: Literal["increases", "decreases", "mixed"]
-    strength: Literal["high", "medium", "low"]
+logger = logging.getLogger(__name__)
 
 
-class _LLMInterpretationPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+def generate_fallback_interpretation(
+    shap_payload: ShapPayload,
+    prediction_charges: float,
+) -> InterpretationPayload:
+    top_three = shap_payload.contributions[:3]
+    top_features_source = shap_payload.contributions[:5]
 
-    headline: str
-    bullets: list[str] = Field(min_length=3, max_length=5)
-    caveats: list[str] = Field(min_length=1, max_length=3)
-    top_features: list[_LLMTopFeature] = Field(min_length=1, max_length=5)
+    bullets = [
+        f"Feature {item.feature} contributed {item.shap_value:.2f} to result."
+        for item in top_three
+    ]
 
+    while len(bullets) < 3:
+        bullets.append("Feature baseline contributed 0.00 to result.")
 
-def _parse_llm_interpretation(
-    client: OpenAI,
-    *,
-    model: str,
-    instruction: str,
-    context_payload: dict[str, object],
-) -> _LLMInterpretationPayload:
-    user_payload = json.dumps(context_payload, separators=(",", ":"))
-
-    response = client.responses.parse(
-        model=model,
-        input=[
-            {"role": "system", "content": instruction},
-            {"role": "user", "content": user_payload},
-        ],
-        text_format=_LLMInterpretationPayload,
+    return InterpretationPayload.model_validate(
+        {
+            "headline": f"Predicted charge is {prediction_charges:.2f}.",
+            "bullets": bullets[:5],
+            "caveats": [
+                "This explanation is for this prediction only.",
+                "Contributions reflect model behavior, not causation.",
+            ],
+            "top_features": [
+                {
+                    "feature": item.feature,
+                    "direction": (
+                        "increases"
+                        if item.shap_value > 0
+                        else "decreases"
+                        if item.shap_value < 0
+                        else "mixed"
+                    ),
+                    "strength": "high"
+                    if rank == 0
+                    else "medium"
+                    if rank in (1, 2)
+                    else "low",
+                }
+                for rank, item in enumerate(top_features_source)
+            ],
+        },
     )
-
-    if response.status == "incomplete":
-        incomplete = response.incomplete_details
-        reason = incomplete.reason if incomplete is not None else "unknown"
-        raise RuntimeError(f"OpenAI response incomplete: {reason}")
-
-    parsed = response.output_parsed
-    if parsed is None:
-        if response.refusal:
-            raise RuntimeError(f"OpenAI refused interpretation: {response.refusal}")
-        raise RuntimeError("OpenAI returned no structured interpretation payload")
-
-    return _LLMInterpretationPayload.model_validate(parsed)
 
 
 def interpret_shap(
     payload: ShapPayload,
     prediction_charges: float,
     settings: Settings,
-) -> InterpretationPayload:
+) -> tuple[InterpretationPayload, str | None]:
+    fallback = generate_fallback_interpretation(
+        shap_payload=payload,
+        prediction_charges=prediction_charges,
+    )
+
     if not settings.openai_api_key:
-        raise RuntimeError("OpenAI not configured")
+        llm_error = "OPENAI_API_KEY missing"
+        logger.warning("LLM_INTERPRETATION_FAILED: %s", llm_error)
+        return fallback, llm_error
 
     client = OpenAI(
         api_key=settings.openai_api_key,
@@ -73,12 +77,14 @@ def interpret_shap(
     )
 
     top_three = payload.contributions[:3]
-    context_payload = {
-        "prediction_charges": prediction_charges,
-        "base_value": payload.base_value,
-        "top_contributions": [item.model_dump() for item in payload.contributions],
-        "context": "This is a local explanation for one prediction.",
-    }
+    context_payload = json.dumps(
+        {
+            "prediction_charges": prediction_charges,
+            "base_value": payload.base_value,
+            "top_contributions": [item.model_dump() for item in payload.contributions],
+            "context": "This is a local explanation for one prediction.",
+        },
+    )
 
     instruction = (
         "You explain one insurance premium prediction. "
@@ -91,11 +97,22 @@ def interpret_shap(
         f"Top-3 features are: {', '.join(item.feature for item in top_three)}."
     )
 
-    llm_payload = _parse_llm_interpretation(
-        client,
-        model=settings.openai_model,
-        instruction=instruction,
-        context_payload=context_payload,
-    )
+    try:
+        response = client.responses.parse(
+            model=settings.openai_model,
+            input=[
+                {"role": "system", "content": instruction},
+                {"role": "user", "content": context_payload},
+            ],
+            text_format=InterpretationPayload,
+        )
 
-    return InterpretationPayload.model_validate(llm_payload.model_dump())
+        parsed = response.output_parsed
+        if parsed is None:
+            raise RuntimeError("OpenAI returned no structured interpretation payload")
+
+        return InterpretationPayload.model_validate(parsed), None
+    except Exception as exc:  # noqa: BLE001 - /predict must never fail because of LLM
+        llm_error = f"{type(exc).__name__}: {exc}"
+        logger.warning("LLM_INTERPRETATION_FAILED: %s", llm_error)
+        return fallback, llm_error

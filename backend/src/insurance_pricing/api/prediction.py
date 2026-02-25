@@ -2,7 +2,10 @@ from fastapi import HTTPException, Request, status
 
 from insurance_pricing.schemas.predict import PredictRequest, PredictResponse
 from insurance_pricing.services.explainability import compute_shap_contributions
-from insurance_pricing.services.llm_interpretation import interpret_shap
+from insurance_pricing.services.llm_interpretation import (
+    generate_fallback_interpretation,
+    interpret_shap,
+)
 from insurance_pricing.services.predictor import check_extrapolation, predict_charges
 from insurance_pricing.settings import get_settings
 
@@ -101,17 +104,18 @@ def run_prediction(payload: PredictRequest, request: Request) -> PredictResponse
         explainability_error = f"{type(exc).__name__}: {exc}"
 
     if shap_payload is not None:
-        if settings.openai_api_key:
-            try:
-                interpretation = interpret_shap(
-                    payload=shap_payload,
-                    prediction_charges=charges,
-                    settings=settings,
-                )
-            except Exception as exc:  # noqa: BLE001 - keep API resilient
-                llm_error = f"{type(exc).__name__}: {exc}"
-        else:
-            llm_error = "OpenAI not configured"
+        try:
+            interpretation, llm_error = interpret_shap(
+                payload=shap_payload,
+                prediction_charges=charges,
+                settings=settings,
+            )
+        except Exception as exc:  # noqa: BLE001 - never fail /predict on interpretation
+            llm_error = f"{type(exc).__name__}: {exc}"
+            interpretation = generate_fallback_interpretation(
+                shap_payload=shap_payload,
+                prediction_charges=charges,
+            )
 
     return PredictResponse(
         charges=charges,
