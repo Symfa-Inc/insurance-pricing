@@ -10,7 +10,7 @@ interface FeaturePanelProps {
   onChange: (id: FeatureSchema["id"], nextValue: string) => void;
   onSubmit: () => void;
   isSubmitting: boolean;
-  submitDisabled?: boolean;
+  submitDisabled: boolean;
   errorMessage?: string | null;
 }
 
@@ -21,7 +21,7 @@ export function FeaturePanel({
   onChange,
   onSubmit,
   isSubmitting,
-  submitDisabled = false,
+  submitDisabled,
   errorMessage = null,
 }: FeaturePanelProps) {
   return (

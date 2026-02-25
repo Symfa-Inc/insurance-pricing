@@ -5,7 +5,7 @@ import { ShapChart } from "@/app/ui/ShapChart";
 
 interface PredictionCardProps {
   result: PredictResponse | null;
-  loading: boolean;
+  status: "idle" | "pending" | "success" | "error";
   error: string | null;
 }
 
@@ -24,14 +24,15 @@ function mergeCaveats(result: PredictResponse): InterpretationPayload | null {
   };
 }
 
-export function PredictionCard({ result, loading, error }: PredictionCardProps) {
-  const interpretationWithCaveats = result ? mergeCaveats(result) : null;
-  const extrapolationCaveats = result?.extrapolation_warnings ?? [];
+export function PredictionCard({ result, status, error }: PredictionCardProps) {
+  const hasResult = status === "success" && result !== null;
+  const interpretationWithCaveats = hasResult ? mergeCaveats(result) : null;
+  const extrapolationCaveats = hasResult ? result.extrapolation_warnings ?? [] : [];
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
       <section>
-        {loading ? (
+        {status === "pending" ? (
           <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               Estimated annual charges
@@ -39,7 +40,7 @@ export function PredictionCard({ result, loading, error }: PredictionCardProps) 
             <h2 className="text-2xl font-semibold text-slate-900">Estimating...</h2>
             <p className="text-sm text-slate-500">Running the model with your submitted inputs.</p>
           </div>
-        ) : result ? (
+        ) : hasResult ? (
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
@@ -71,13 +72,13 @@ export function PredictionCard({ result, loading, error }: PredictionCardProps) 
         )}
       </section>
 
-      {error ? (
+      {status === "error" && error ? (
         <div className="mt-6 border-t border-slate-100 pt-6">
           <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-sm text-rose-700">{error}</div>
         </div>
       ) : null}
 
-      {result ? (
+      {hasResult ? (
         <div className="mt-6 border-t border-slate-100 pt-6">
           {interpretationWithCaveats ? (
             <InterpretationCard interpretation={interpretationWithCaveats} embedded />
@@ -102,7 +103,7 @@ export function PredictionCard({ result, loading, error }: PredictionCardProps) 
         </div>
       ) : null}
 
-      {result ? (
+      {hasResult ? (
         <div className="mt-6 border-t border-slate-100 pt-6">
           {result.shap?.contributions?.length ? (
             <ShapChart
@@ -123,7 +124,7 @@ export function PredictionCard({ result, loading, error }: PredictionCardProps) 
         </div>
       ) : null}
 
-      {result?.explainability_error || result?.llm_error ? (
+      {hasResult && (result.explainability_error || result.llm_error) ? (
         <div className="mt-6 border-t border-slate-100 pt-6">
           <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-700">
             {result.explainability_error ? `Explainability: ${result.explainability_error}` : null}

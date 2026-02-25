@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   createInitialFeatureValues,
@@ -81,13 +81,33 @@ function toPredictRequest(
   return { payload, error: null };
 }
 
+function createInputFingerprint(
+  formValues: FeatureFormValues,
+  features: readonly FeatureSchema[],
+): string {
+  const orderedEntries = [...features]
+    .map((feature) => feature.id)
+    .sort()
+    .map((featureId) => [featureId, formValues[featureId]]);
+
+  return JSON.stringify(Object.fromEntries(orderedEntries));
+}
+
 export default function Home() {
   const [featureValues, setFeatureValues] = useState<FeatureFormValues>(() =>
     createInitialFeatureValues(FEATURE_SCHEMA),
   );
   const [result, setResult] = useState<PredictResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [lastSubmittedFingerprint, setLastSubmittedFingerprint] = useState<string | null>(null);
+  const currentFingerprint = useMemo(
+    () => createInputFingerprint(featureValues, FEATURE_SCHEMA),
+    [featureValues],
+  );
+  const isSubmitting = status === "pending";
+  const submitDisabled =
+    isSubmitting || (lastSubmittedFingerprint !== null && lastSubmittedFingerprint === currentFingerprint);
 
   const handleFeatureChange = (id: FeatureSchema["id"], nextValue: string) => {
     setFeatureValues((previous) => ({
@@ -97,23 +117,25 @@ export default function Home() {
   };
 
   const handleSubmit = async () => {
-    setLoading(true);
+    setLastSubmittedFingerprint(currentFingerprint);
+    setStatus("pending");
     setError(null);
+    setResult(null);
     const { payload, error: validationError } = toPredictRequest(featureValues, FEATURE_SCHEMA);
 
     if (!payload) {
       setError(validationError ?? "Please review your inputs.");
-      setLoading(false);
+      setStatus("error");
       return;
     }
 
     try {
       const data = await predictInsurancePricing(payload);
       setResult(data);
+      setStatus("success");
     } catch {
       setError("Unable to estimate charges right now. Please try again.");
-    } finally {
-      setLoading(false);
+      setStatus("error");
     }
   };
 
@@ -136,13 +158,13 @@ export default function Home() {
               values={featureValues}
               onChange={handleFeatureChange}
               onSubmit={handleSubmit}
-              isSubmitting={loading}
-              submitDisabled={loading}
+              isSubmitting={isSubmitting}
+              submitDisabled={submitDisabled}
             />
           </div>
 
           <div className="w-full flex-1">
-            <PredictionCard result={result} loading={loading} error={error} />
+            <PredictionCard result={result} status={status} error={error} />
           </div>
         </section>
       </main>
