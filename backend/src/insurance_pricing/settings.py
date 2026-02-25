@@ -36,7 +36,7 @@ class Settings(BaseModel):
     transformer_path: Path = MODELS_DIR / "feature_transformer.joblib"
     cors_origins: list[str] = Field(default_factory=lambda: list(DEFAULT_CORS_ORIGINS))
     openai_api_key: str | None = None
-    openai_model: str = "gpt-5-nano-2025-08-07"
+    openai_model: str = "gpt-4o-mini-2024-07-18"
     openai_timeout_seconds: float = 15.0
     explain_top_k: int = 8
 
