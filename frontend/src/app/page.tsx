@@ -62,10 +62,10 @@ function toPredictRequest(
             error: `${feature.label} must be a valid number.`,
           };
         }
-        if (parsed < 15.96 || parsed > 53.13) {
+        if (parsed < 15 || parsed > 53) {
           return {
             payload: null,
-            error: `${feature.label} must be between 15.96 and 53.13.`,
+            error: `${feature.label} must be between 15 and 53.`,
           };
         }
         payload.bmi = parsed;

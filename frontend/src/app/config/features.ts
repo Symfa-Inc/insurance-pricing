@@ -68,9 +68,9 @@ export const FEATURE_SCHEMA: readonly FeatureSchema[] = [
     defaultValue: 27.5,
     placeholder: "e.g. 24.3",
     help: "Body mass index",
-    step: 0.01,
-    min: 15.96,
-    max: 53.13,
+    step: 0.1,
+    min: 15,
+    max: 53,
   },
   {
     id: "children",
