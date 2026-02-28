@@ -42,6 +42,12 @@ function toPredictRequest(
             error: `${feature.label} must be a valid number.`,
           };
         }
+        if (!Number.isInteger(parsed) || parsed < 18 || parsed > 64) {
+          return {
+            payload: null,
+            error: `${feature.label} must be an integer between 18 and 64.`,
+          };
+        }
         payload.age = parsed;
         break;
       }
@@ -54,6 +60,12 @@ function toPredictRequest(
           return {
             payload: null,
             error: `${feature.label} must be a valid number.`,
+          };
+        }
+        if (parsed < 15.96 || parsed > 53.13) {
+          return {
+            payload: null,
+            error: `${feature.label} must be between 15.96 and 53.13.`,
           };
         }
         payload.bmi = parsed;
