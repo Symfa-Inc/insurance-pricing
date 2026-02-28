@@ -8,9 +8,9 @@ from fastapi.responses import FileResponse
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
-NOTEBOOKS_DIR = Path(__file__).resolve().parents[4] / "notebooks"
-EDA_REPORT_PATH = NOTEBOOKS_DIR / "eda_report.md"
-EVALUATION_REPORT_PATH = NOTEBOOKS_DIR / "evaluation_report.md"
+REPORTS_DIR = Path(__file__).resolve().parents[4] / "reports"
+EDA_REPORT_PATH = REPORTS_DIR / "eda_report.md"
+EVALUATION_REPORT_PATH = REPORTS_DIR / "evaluation_report.md"
 EDA_ASSETS_BASE_URL = "/reports/eda/assets"
 MARKDOWN_IMAGE_PATTERN = re.compile(
     r"!\[(?P<alt>[^\]]*)\]\((?P<url>[^)\s]+)(?P<title>\s+\"[^\"]*\")?\)",
@@ -52,9 +52,9 @@ def _read_markdown_or_404(path: Path) -> str:
 
 @router.get("/eda/assets/{path:path}")
 async def get_eda_asset(path: str) -> FileResponse:
-    requested_path = (NOTEBOOKS_DIR / path).resolve(strict=False)
+    requested_path = (REPORTS_DIR / path).resolve(strict=False)
 
-    if not requested_path.is_relative_to(NOTEBOOKS_DIR):
+    if not requested_path.is_relative_to(REPORTS_DIR):
         raise HTTPException(status_code=404, detail="Asset not found")
 
     if not requested_path.exists() or not requested_path.is_file():

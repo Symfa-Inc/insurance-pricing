@@ -90,8 +90,8 @@ The training/evaluation pipeline includes report generation for both technical a
 - The evaluation stage uses an LLM step to generate plain-language interpretation of metric outcomes.
 - `backend/src/train/stages/run_eda.py` produces exploratory data insights.
 - Outputs are generated as Markdown files:
-  - `backend/notebooks/eda_report.md`
-  - `backend/notebooks/evaluation_report.md`
+  - `backend/reports/eda_report.md`
+  - `backend/reports/evaluation_report.md`
 
 ## Project Structure
 
@@ -101,7 +101,7 @@ insurance-pricing-assistant/
 │   ├── src/insurance_pricing/
 │   ├── models/
 │   ├── data/
-│   ├── notebooks/
+│   ├── reports/
 │   └── pyproject.toml
 ├── frontend/
 ├── Dockerfile

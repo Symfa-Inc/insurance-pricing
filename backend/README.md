@@ -15,7 +15,7 @@ backend/
 │   ├── __init__.py
 │   └── main.py             # FastAPI application
 ├── models/                 # Trained ML model artifacts
-├── notebooks/              # Jupyter notebooks (EDA, experiments)
+├── reports/                # Generated experiment/analysis reports
 ├── scripts/                # Training & preprocessing scripts
 ├── data/                   # Datasets
 └── pyproject.toml          # Package dependencies
