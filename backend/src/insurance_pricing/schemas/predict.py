@@ -42,11 +42,15 @@ class InterpretationPayload(BaseModel):
     top_features: list[TopFeatureDirection] = Field(default_factory=list)
 
 
+InterpretationSource = Literal["fallback", "OPENAI"]
+
+
 class PredictResponse(BaseModel):
     charges: float
     model_version: str | None = None
     extrapolation_warnings: list[str] = Field(default_factory=list)
     shap: ShapPayload | None = None
     interpretation: InterpretationPayload | None = None
+    interpretation_source: InterpretationSource | None = None
     explainability_error: str | None = None
     llm_error: str | None = None

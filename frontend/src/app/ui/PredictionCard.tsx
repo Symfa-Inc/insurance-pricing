@@ -19,6 +19,9 @@ function formatCurrency(value: number): string {
 
 export function PredictionCard({ result, status, error }: PredictionCardProps) {
   const hasResult = status === "success" && result !== null;
+  const interpretationSource =
+    result?.interpretation_source ??
+    (result?.interpretation ? (result.llm_error ? "fallback" : "OPENAI") : undefined);
 
   if (status === "idle") {
     return (
@@ -92,7 +95,10 @@ export function PredictionCard({ result, status, error }: PredictionCardProps) {
           className="animate-fade-in-up rounded-xl border border-zinc-100 bg-white p-6 shadow-sm"
           style={{ animationDelay: "100ms" }}
         >
-          <InterpretationCard interpretation={result.interpretation} />
+          <InterpretationCard
+            interpretation={result.interpretation}
+            source={interpretationSource ?? "OPENAI"}
+          />
         </div>
       )}
 

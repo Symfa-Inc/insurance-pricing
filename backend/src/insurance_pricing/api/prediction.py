@@ -91,6 +91,7 @@ def run_prediction(payload: PredictRequest, request: Request) -> PredictResponse
     llm_error: str | None = None
     shap_payload = None
     interpretation = None
+    interpretation_source = None
 
     settings = get_settings()
     try:
@@ -110,12 +111,14 @@ def run_prediction(payload: PredictRequest, request: Request) -> PredictResponse
                 prediction_charges=charges,
                 settings=settings,
             )
+            interpretation_source = "fallback" if llm_error else "OPENAI"
         except Exception as exc:  # noqa: BLE001 - never fail /predict on interpretation
             llm_error = f"{type(exc).__name__}: {exc}"
             interpretation = generate_fallback_interpretation(
                 shap_payload=shap_payload,
                 prediction_charges=charges,
             )
+            interpretation_source = "fallback"
 
     return PredictResponse(
         charges=charges,
@@ -123,6 +126,7 @@ def run_prediction(payload: PredictRequest, request: Request) -> PredictResponse
         extrapolation_warnings=warnings,
         shap=shap_payload,
         interpretation=interpretation,
+        interpretation_source=interpretation_source,
         explainability_error=explainability_error,
         llm_error=llm_error,
     )
