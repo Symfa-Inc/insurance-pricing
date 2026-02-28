@@ -1,6 +1,7 @@
 import type { PredictResponse } from "@/app/types/api";
 import { InterpretationCard } from "@/app/ui/InterpretationCard";
 import { ShapChart } from "@/app/ui/ShapChart";
+import { Tooltip } from "@/app/ui/Tooltip";
 
 interface PredictionCardProps {
   result: PredictResponse | null;
@@ -72,11 +73,14 @@ export function PredictionCard({ result, status, error }: PredictionCardProps) {
   return (
     <div className="space-y-4">
       {/* Price */}
-      <div className="animate-fade-in-up relative overflow-hidden rounded-xl border border-zinc-100 bg-white p-6 shadow-sm">
+      <div className="animate-fade-in-up relative rounded-xl border border-zinc-100 bg-white p-6 shadow-sm">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent" />
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
-          Estimated Annual Charges
-        </p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+            Estimated Annual Charges
+          </p>
+          <Tooltip text="Predicted annual insurance cost based on the inputs you provided." />
+        </div>
         <p className="mt-3 font-mono text-4xl font-semibold tracking-tight text-zinc-900">
           {formatCurrency(result.charges)}
         </p>

@@ -14,6 +14,7 @@ export interface NumericFeatureSchema<I extends FeatureId = FeatureId>
   defaultValue: number;
   placeholder?: string;
   help?: string;
+  step?: number;
 }
 
 export interface SelectFeatureSchema<I extends FeatureId = FeatureId, O extends string = string>
@@ -51,6 +52,7 @@ export const FEATURE_SCHEMA: readonly FeatureSchema[] = [
     defaultValue: 27.5,
     placeholder: "e.g. 24.3",
     help: "Body mass index",
+    step: 0.5,
   },
   {
     id: "children",

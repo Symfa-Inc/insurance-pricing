@@ -1,4 +1,5 @@
 import type { ShapContribution } from "@/app/types/api";
+import { Tooltip } from "@/app/ui/Tooltip";
 
 interface ShapChartProps {
   contributions: ShapContribution[];
@@ -21,13 +22,16 @@ export function ShapChart({ contributions }: ShapChartProps) {
 
   return (
     <section>
-      <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
-        Feature Impact
-      </p>
+      <div className="flex items-center gap-1.5">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+          Feature Impact
+        </p>
+        <Tooltip text="Shows how each input pushed the estimate higher or lower relative to the average." />
+      </div>
 
-      <ul className="mt-4 space-y-3.5">
+      <ul className="mt-4 space-y-3">
         {contributions.map((item) => {
-          const pct = Math.max(3, (Math.abs(item.shap_value) / maxAbs) * 100);
+          const widthPct = Math.max(2, (Math.abs(item.shap_value) / maxAbs) * 45);
           const positive = item.shap_value >= 0;
 
           return (
@@ -48,12 +52,15 @@ export function ShapChart({ contributions }: ShapChartProps) {
                   {item.shap_value.toFixed(0)}
                 </span>
               </div>
-              <div className="mt-1.5 h-1.5 rounded-full bg-zinc-100">
+              <div className="relative mt-1.5 h-2 rounded-full bg-zinc-100">
+                <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-zinc-300" />
                 <div
-                  className={`h-1.5 rounded-full transition-all duration-700 ease-out ${
-                    positive ? "bg-emerald-500" : "bg-rose-400"
+                  className={`absolute inset-y-0 transition-all duration-700 ease-out ${
+                    positive
+                      ? "left-1/2 rounded-r-full bg-emerald-500"
+                      : "right-1/2 rounded-l-full bg-rose-400"
                   }`}
-                  style={{ width: `${pct}%` }}
+                  style={{ width: `${widthPct}%` }}
                 />
               </div>
             </li>
