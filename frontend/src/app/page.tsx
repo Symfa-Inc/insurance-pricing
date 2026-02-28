@@ -140,27 +140,22 @@ export default function Home() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-slate-50 text-slate-900"
-      style={{
-        backgroundImage:
-          "radial-gradient(circle at top left, rgba(99,102,241,0.14), transparent 45%), radial-gradient(circle at 30% 20%, rgba(99,102,241,0.12), transparent 40%), radial-gradient(circle at 90% 10%, rgba(148,163,184,0.16), transparent 45%)",
-      }}
-    >
-      <main className="mx-auto min-h-screen w-full max-w-6xl space-y-8 px-6 py-10">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900">
+      <main className="mx-auto w-full max-w-5xl px-6 py-10">
         <PageIntro />
 
-        <section className="flex flex-col gap-8 md:flex-row md:items-start">
-          <div className="w-full md:w-72 md:flex-none">
-            <FeaturePanel
-              title="Feature inputs"
-              features={FEATURE_SCHEMA}
-              values={featureValues}
-              onChange={handleFeatureChange}
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-              submitDisabled={submitDisabled}
-            />
+        <section className="mt-8 flex flex-col gap-6 md:flex-row md:items-start">
+          <div className="w-full md:w-60 md:flex-none">
+            <div className="rounded-xl border border-zinc-100 bg-white p-5 shadow-sm">
+              <FeaturePanel
+                features={FEATURE_SCHEMA}
+                values={featureValues}
+                onChange={handleFeatureChange}
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+                submitDisabled={submitDisabled}
+              />
+            </div>
           </div>
 
           <div className="w-full flex-1">

@@ -2,58 +2,58 @@ import type { ShapContribution } from "@/app/types/api";
 
 interface ShapChartProps {
   contributions: ShapContribution[];
-  embedded?: boolean;
 }
 
-function formatFeatureValue(value: string | number): string {
+function formatValue(value: string | number): string {
   if (typeof value === "number") {
-    return Number.isInteger(value) ? `${value}` : value.toFixed(2);
+    return Number.isInteger(value) ? `${value}` : value.toFixed(1);
   }
   return value;
 }
 
-export function ShapChart({ contributions, embedded = false }: ShapChartProps) {
-  if (contributions.length === 0) {
-    return null;
-  }
+export function ShapChart({ contributions }: ShapChartProps) {
+  if (contributions.length === 0) return null;
 
-  const maxAbs = Math.max(...contributions.map((item) => Math.abs(item.shap_value)), 1e-9);
-  const containerClass = embedded ? "" : "rounded-2xl border border-slate-200 bg-white p-8 shadow-sm";
+  const maxAbs = Math.max(
+    ...contributions.map((c) => Math.abs(c.shap_value)),
+    1e-9,
+  );
 
   return (
-    <section className={containerClass}>
-      <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Explainability</p>
-        <h3 className="text-2xl font-semibold text-slate-900">What influenced the estimate</h3>
-      </div>
+    <section>
+      <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+        Feature Impact
+      </p>
 
-      <ul className="mt-6 space-y-4">
+      <ul className="mt-4 space-y-3.5">
         {contributions.map((item) => {
-          const widthPercent = Math.max(1.5, (Math.abs(item.shap_value) / maxAbs) * 50);
-          const isPositive = item.shap_value >= 0;
-          const tone = isPositive
-            ? "bg-gradient-to-r from-indigo-500 to-indigo-300 text-indigo-700"
-            : "bg-gradient-to-l from-rose-500 to-rose-300 text-rose-700";
-          const directionLabel = isPositive ? "adds to estimate" : "reduces estimate";
+          const pct = Math.max(3, (Math.abs(item.shap_value) / maxAbs) * 100);
+          const positive = item.shap_value >= 0;
 
           return (
-            <li key={`${item.feature}-${item.value}`} className="space-y-2">
-              <div className="flex items-center justify-between gap-3 text-sm">
-                <span className="font-medium text-slate-700">
-                  {item.feature} = {formatFeatureValue(item.value)}
+            <li key={`${item.feature}-${item.value}`}>
+              <div className="flex items-baseline justify-between gap-2 text-sm">
+                <span className="font-medium text-zinc-700">
+                  {item.feature}{" "}
+                  <span className="font-normal text-zinc-400">
+                    {formatValue(item.value)}
+                  </span>
                 </span>
-                <span className={`text-xs ${isPositive ? "text-indigo-600" : "text-rose-600"}`}>
-                  {isPositive ? "+" : "-"}
-                  {Math.abs(item.shap_value).toFixed(2)} ({directionLabel})
+                <span
+                  className={`font-mono text-xs font-medium tabular-nums ${
+                    positive ? "text-emerald-600" : "text-rose-500"
+                  }`}
+                >
+                  {positive ? "+" : ""}
+                  {item.shap_value.toFixed(0)}
                 </span>
               </div>
-              <div className="relative h-5 overflow-hidden rounded-full bg-slate-100">
-                <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-slate-300" />
+              <div className="mt-1.5 h-1.5 rounded-full bg-zinc-100">
                 <div
-                  className={`absolute inset-y-0 ${tone} ${
-                    isPositive ? "left-1/2 rounded-r-full" : "right-1/2 rounded-l-full"
+                  className={`h-1.5 rounded-full transition-all duration-700 ease-out ${
+                    positive ? "bg-emerald-500" : "bg-rose-400"
                   }`}
-                  style={{ width: `${widthPercent}%` }}
+                  style={{ width: `${pct}%` }}
                 />
               </div>
             </li>

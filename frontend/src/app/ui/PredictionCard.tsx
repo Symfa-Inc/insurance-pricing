@@ -1,6 +1,5 @@
-import type { InterpretationPayload, PredictResponse } from "@/app/types/api";
+import type { PredictResponse } from "@/app/types/api";
 import { InterpretationCard } from "@/app/ui/InterpretationCard";
-import { formatCurrencyUSD } from "@/app/ui/StatusSummary";
 import { ShapChart } from "@/app/ui/ShapChart";
 
 interface PredictionCardProps {
@@ -9,130 +8,99 @@ interface PredictionCardProps {
   error: string | null;
 }
 
-function mergeCaveats(result: PredictResponse): InterpretationPayload | null {
-  if (!result.interpretation) {
-    return null;
-  }
-
-  const mergedCaveats = Array.from(
-    new Set([...(result.interpretation.caveats ?? []), ...(result.extrapolation_warnings ?? [])]),
-  );
-
-  return {
-    ...result.interpretation,
-    caveats: mergedCaveats,
-  };
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  }).format(value);
 }
 
 export function PredictionCard({ result, status, error }: PredictionCardProps) {
   const hasResult = status === "success" && result !== null;
-  const interpretationWithCaveats = hasResult ? mergeCaveats(result) : null;
-  const extrapolationCaveats = hasResult ? result.extrapolation_warnings ?? [] : [];
+
+  if (status === "idle") {
+    return (
+      <div className="flex h-full min-h-48 items-center justify-center rounded-xl border border-dashed border-zinc-200 p-12">
+        <p className="text-sm text-zinc-400">
+          Enter your details and click Estimate
+        </p>
+      </div>
+    );
+  }
+
+  if (status === "pending") {
+    return (
+      <div className="flex h-full min-h-48 items-center justify-center rounded-xl border border-zinc-100 bg-white p-12 shadow-sm">
+        <div className="flex flex-col items-center gap-3">
+          <svg
+            className="h-5 w-5 animate-spin text-zinc-400"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="opacity-20"
+            />
+            <path
+              d="M12 2a10 10 0 0 1 10 10"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+          <p className="text-sm text-zinc-400">Running estimate...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="rounded-xl border border-red-100 bg-red-50 px-5 py-4">
+        <p className="text-sm text-red-600">{error}</p>
+      </div>
+    );
+  }
+
+  if (!hasResult) return null;
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-      <section>
-        {status === "pending" ? (
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Estimated annual charges
-            </p>
-            <h2 className="text-2xl font-semibold text-slate-900">Estimating...</h2>
-            <p className="text-sm text-slate-500">Running the model with your submitted inputs.</p>
-          </div>
-        ) : hasResult ? (
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                Estimated annual charges
-              </p>
-              <h2 className="text-2xl font-semibold text-slate-900">Pricing estimate</h2>
-              <p className="text-sm text-slate-500">Estimate generated from your submitted profile.</p>
-              {result.model_version ? (
-                <p className="text-sm text-slate-500">Model version: {result.model_version}</p>
-              ) : null}
-            </div>
-            <div className="rounded-2xl border border-indigo-100 bg-indigo-50 px-6 py-4 text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
-                Estimated Charges
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-indigo-600">
-                {formatCurrencyUSD(result.charges)}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Estimated annual charges
-            </p>
-            <h2 className="text-2xl font-semibold text-slate-900">Estimated annual charges</h2>
-            <p className="text-sm text-slate-500">Submit inputs to get an estimate.</p>
-          </div>
-        )}
-      </section>
+    <div className="space-y-4">
+      {/* Price */}
+      <div className="animate-fade-in-up relative overflow-hidden rounded-xl border border-zinc-100 bg-white p-6 shadow-sm">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent" />
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+          Estimated Annual Charges
+        </p>
+        <p className="mt-3 font-mono text-4xl font-semibold tracking-tight text-zinc-900">
+          {formatCurrency(result.charges)}
+        </p>
+      </div>
 
-      {status === "error" && error ? (
-        <div className="mt-6 border-t border-slate-100 pt-6">
-          <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-sm text-rose-700">{error}</div>
+      {/* Interpretation */}
+      {result.interpretation && (
+        <div
+          className="animate-fade-in-up rounded-xl border border-zinc-100 bg-white p-6 shadow-sm"
+          style={{ animationDelay: "100ms" }}
+        >
+          <InterpretationCard interpretation={result.interpretation} />
+        </div>
+      )}
+
+      {/* SHAP Chart */}
+      {result.shap?.contributions?.length ? (
+        <div
+          className="animate-fade-in-up rounded-xl border border-zinc-100 bg-white p-6 shadow-sm"
+          style={{ animationDelay: "200ms" }}
+        >
+          <ShapChart contributions={result.shap.contributions} />
         </div>
       ) : null}
-
-      {hasResult ? (
-        <div className="mt-6 border-t border-slate-100 pt-6">
-          {interpretationWithCaveats ? (
-            <InterpretationCard interpretation={interpretationWithCaveats} embedded />
-          ) : (
-            <section>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Interpretation</p>
-              <p className="mt-3 text-sm text-slate-500">Interpretation is not available for this prediction.</p>
-              {extrapolationCaveats.length ? (
-                <div className="mt-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Caveats</p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5">
-                    {extrapolationCaveats.map((caveat) => (
-                      <li key={caveat} className="text-xs text-slate-400">
-                        {caveat}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </section>
-          )}
-        </div>
-      ) : null}
-
-      {hasResult ? (
-        <div className="mt-6 border-t border-slate-100 pt-6">
-          {result.shap?.contributions?.length ? (
-            <ShapChart
-              contributions={result.shap.contributions}
-              baseValue={result.shap.base_value}
-              predictedValue={result.charges}
-              embedded
-            />
-          ) : (
-            <section>
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Explainability</p>
-                <h3 className="text-2xl font-semibold text-slate-900">What influenced the estimate</h3>
-              </div>
-              <p className="mt-6 text-sm text-slate-500">SHAP contributions are not available for this prediction.</p>
-            </section>
-          )}
-        </div>
-      ) : null}
-
-      {hasResult && (result.explainability_error || result.llm_error) ? (
-        <div className="mt-6 border-t border-slate-100 pt-6">
-          <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-700">
-            {result.explainability_error ? `Explainability: ${result.explainability_error}` : null}
-            {result.explainability_error && result.llm_error ? " " : null}
-            {result.llm_error ? `Interpretation: ${result.llm_error}` : null}
-          </div>
-        </div>
-      ) : null}
-    </section>
+    </div>
   );
 }
