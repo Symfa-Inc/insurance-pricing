@@ -22,7 +22,7 @@
 
 ## Overview
 
-Insurance Pricing Assistant predicts annual insurance charges from customer profile inputs through a FastAPI backend and a modern Next.js frontend.  
+Insurance Pricing Assistant predicts annual insurance charges from customer profile inputs through a FastAPI backend and a modern Next.js frontend.
 Beyond returning a numeric estimate, each prediction includes model transparency signals (SHAP feature contributions) and an LLM-generated interpretation so users can understand the likely drivers behind the result.
 
 The project also includes an evaluation stage that generates Markdown artifacts (`eda_report.md` and `evaluation_report.md`) for reproducible model analysis and communication.
@@ -173,5 +173,5 @@ Local URLs:
 
 ## License
 
-This project is licensed under the Apache License 2.0.  
+This project is licensed under the Apache License 2.0.
 See `LICENSE` for details.

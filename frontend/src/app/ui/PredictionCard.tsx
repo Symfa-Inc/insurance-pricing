@@ -98,6 +98,7 @@ export function PredictionCard({ result, status, error }: PredictionCardProps) {
           <InterpretationCard
             interpretation={result.interpretation}
             source={interpretationSource ?? "OPENAI"}
+            baseValue={result.shap?.base_value}
           />
         </div>
       )}
