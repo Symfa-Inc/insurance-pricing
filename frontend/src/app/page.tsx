@@ -70,6 +70,12 @@ function toPredictRequest(
             error: `${feature.label} must be a valid number.`,
           };
         }
+        if (!Number.isInteger(parsed) || parsed < 0 || parsed > 6) {
+          return {
+            payload: null,
+            error: `${feature.label} must be an integer between 0 and 6.`,
+          };
+        }
         payload.children = parsed;
         break;
       }

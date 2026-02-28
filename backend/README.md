@@ -63,9 +63,8 @@ uv run ruff format src/
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/v1/health` | Health check |
-| GET | `/api/v1/version` | App name and version |
-| POST | `/api/v1/predict` | Predict insurance premium |
+| GET | `/health` | Health check |
+| POST | `/predict` | Predict insurance premium |
 
 ## ⚙️ Dependency Note (pyproject-compatible)
 
@@ -82,9 +81,8 @@ numpy
 ## 🧾 Curl Examples
 
 ```bash
-curl http://localhost:8000/api/v1/health
-curl http://localhost:8000/api/v1/version
-curl -X POST http://localhost:8000/api/v1/predict \
+curl http://localhost:8000/health
+curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{
     "age": 41,

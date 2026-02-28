@@ -11,7 +11,7 @@ router = APIRouter(prefix="/reports", tags=["reports"])
 NOTEBOOKS_DIR = Path(__file__).resolve().parents[4] / "notebooks"
 EDA_REPORT_PATH = NOTEBOOKS_DIR / "eda_report.md"
 EVALUATION_REPORT_PATH = NOTEBOOKS_DIR / "evaluation_report.md"
-EDA_ASSETS_BASE_URL = "/api/v1/reports/eda/assets"
+EDA_ASSETS_BASE_URL = "/reports/eda/assets"
 MARKDOWN_IMAGE_PATTERN = re.compile(
     r"!\[(?P<alt>[^\]]*)\]\((?P<url>[^)\s]+)(?P<title>\s+\"[^\"]*\")?\)",
 )

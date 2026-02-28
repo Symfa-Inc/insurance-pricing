@@ -16,7 +16,7 @@ export async function predictInsurancePricing(
   payload: PredictRequest,
   signal?: AbortSignal,
 ): Promise<PredictResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/predict`, {
+  const response = await fetch(`${API_BASE_URL}/predict`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -19,6 +19,8 @@ export interface NumericFeatureSchema<
   placeholder?: string;
   help?: string;
   step?: number;
+  min?: number;
+  max?: number;
 }
 
 export interface SelectFeatureSchema<
@@ -72,6 +74,9 @@ export const FEATURE_SCHEMA: readonly FeatureSchema[] = [
     defaultValue: 0,
     placeholder: "e.g. 2",
     help: "Number of dependents",
+    step: 1,
+    min: 0,
+    max: 6,
   },
   {
     id: "smoker",
