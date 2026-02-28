@@ -37,7 +37,10 @@ function toPredictRequest(
         }
         const parsed = Number(rawValue);
         if (!Number.isFinite(parsed)) {
-          return { payload: null, error: `${feature.label} must be a valid number.` };
+          return {
+            payload: null,
+            error: `${feature.label} must be a valid number.`,
+          };
         }
         payload.age = parsed;
         break;
@@ -48,7 +51,10 @@ function toPredictRequest(
         }
         const parsed = Number(rawValue);
         if (!Number.isFinite(parsed)) {
-          return { payload: null, error: `${feature.label} must be a valid number.` };
+          return {
+            payload: null,
+            error: `${feature.label} must be a valid number.`,
+          };
         }
         payload.bmi = parsed;
         break;
@@ -59,7 +65,10 @@ function toPredictRequest(
         }
         const parsed = Number(rawValue);
         if (!Number.isFinite(parsed)) {
-          return { payload: null, error: `${feature.label} must be a valid number.` };
+          return {
+            payload: null,
+            error: `${feature.label} must be a valid number.`,
+          };
         }
         payload.children = parsed;
         break;
@@ -98,16 +107,22 @@ export default function Home() {
     createInitialFeatureValues(FEATURE_SCHEMA),
   );
   const [result, setResult] = useState<PredictResponse | null>(null);
-  const [status, setStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "pending" | "success" | "error"
+  >("idle");
   const [error, setError] = useState<string | null>(null);
-  const [lastSubmittedFingerprint, setLastSubmittedFingerprint] = useState<string | null>(null);
+  const [lastSubmittedFingerprint, setLastSubmittedFingerprint] = useState<
+    string | null
+  >(null);
   const currentFingerprint = useMemo(
     () => createInputFingerprint(featureValues, FEATURE_SCHEMA),
     [featureValues],
   );
   const isSubmitting = status === "pending";
   const submitDisabled =
-    isSubmitting || (lastSubmittedFingerprint !== null && lastSubmittedFingerprint === currentFingerprint);
+    isSubmitting ||
+    (lastSubmittedFingerprint !== null &&
+      lastSubmittedFingerprint === currentFingerprint);
 
   const handleFeatureChange = (id: FeatureSchema["id"], nextValue: string) => {
     setFeatureValues((previous) => ({
@@ -121,7 +136,10 @@ export default function Home() {
     setStatus("pending");
     setError(null);
     setResult(null);
-    const { payload, error: validationError } = toPredictRequest(featureValues, FEATURE_SCHEMA);
+    const { payload, error: validationError } = toPredictRequest(
+      featureValues,
+      FEATURE_SCHEMA,
+    );
 
     if (!payload) {
       setError(validationError ?? "Please review your inputs.");

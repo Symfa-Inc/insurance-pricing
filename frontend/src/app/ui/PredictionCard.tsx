@@ -21,7 +21,11 @@ export function PredictionCard({ result, status, error }: PredictionCardProps) {
   const hasResult = status === "success" && result !== null;
   const interpretationSource =
     result?.interpretation_source ??
-    (result?.interpretation ? (result.llm_error ? "fallback" : "OPENAI") : undefined);
+    (result?.interpretation
+      ? result.llm_error
+        ? "fallback"
+        : "OPENAI"
+      : undefined);
 
   if (status === "idle") {
     return (

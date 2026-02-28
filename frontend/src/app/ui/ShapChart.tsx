@@ -31,7 +31,10 @@ export function ShapChart({ contributions }: ShapChartProps) {
 
       <ul className="mt-4 space-y-3">
         {contributions.map((item) => {
-          const widthPct = Math.max(2, (Math.abs(item.shap_value) / maxAbs) * 45);
+          const widthPct = Math.max(
+            2,
+            (Math.abs(item.shap_value) / maxAbs) * 45,
+          );
           const positive = item.shap_value >= 0;
 
           return (

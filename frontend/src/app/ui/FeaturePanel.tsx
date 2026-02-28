@@ -1,7 +1,4 @@
-import type {
-  FeatureFormValues,
-  FeatureSchema,
-} from "@/app/config/features";
+import type { FeatureFormValues, FeatureSchema } from "@/app/config/features";
 
 interface FeaturePanelProps {
   features: readonly FeatureSchema[];

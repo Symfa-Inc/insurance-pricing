@@ -3,22 +3,28 @@ import type { PredictRequest, Region, Sex, Smoker } from "@/app/types/api";
 export type FeatureId = keyof PredictRequest;
 export type FeatureFormValues = Record<FeatureId, string>;
 
-interface BaseFeatureSchema<I extends FeatureId, K extends "number" | "select"> {
+interface BaseFeatureSchema<
+  I extends FeatureId,
+  K extends "number" | "select",
+> {
   id: I;
   type: K;
   label: string;
 }
 
-export interface NumericFeatureSchema<I extends FeatureId = FeatureId>
-  extends BaseFeatureSchema<I, "number"> {
+export interface NumericFeatureSchema<
+  I extends FeatureId = FeatureId,
+> extends BaseFeatureSchema<I, "number"> {
   defaultValue: number;
   placeholder?: string;
   help?: string;
   step?: number;
 }
 
-export interface SelectFeatureSchema<I extends FeatureId = FeatureId, O extends string = string>
-  extends BaseFeatureSchema<I, "select"> {
+export interface SelectFeatureSchema<
+  I extends FeatureId = FeatureId,
+  O extends string = string,
+> extends BaseFeatureSchema<I, "select"> {
   options: readonly O[];
   defaultValue: O;
 }
@@ -27,7 +33,12 @@ export type FeatureSchema = NumericFeatureSchema | SelectFeatureSchema;
 
 const SEX_OPTIONS = ["female", "male"] as const satisfies readonly Sex[];
 const SMOKER_OPTIONS = ["no", "yes"] as const satisfies readonly Smoker[];
-const REGION_OPTIONS = ["northeast", "northwest", "southeast", "southwest"] as const satisfies readonly Region[];
+const REGION_OPTIONS = [
+  "northeast",
+  "northwest",
+  "southeast",
+  "southwest",
+] as const satisfies readonly Region[];
 
 export const FEATURE_SCHEMA: readonly FeatureSchema[] = [
   {
@@ -78,7 +89,9 @@ export const FEATURE_SCHEMA: readonly FeatureSchema[] = [
   },
 ] as const;
 
-export function createInitialFeatureValues(features: readonly FeatureSchema[]): FeatureFormValues {
+export function createInitialFeatureValues(
+  features: readonly FeatureSchema[],
+): FeatureFormValues {
   const values: Partial<FeatureFormValues> = {};
 
   features.forEach((feature) => {

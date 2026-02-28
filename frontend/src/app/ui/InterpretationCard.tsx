@@ -1,4 +1,7 @@
-import type { InterpretationPayload, InterpretationSource } from "@/app/types/api";
+import type {
+  InterpretationPayload,
+  InterpretationSource,
+} from "@/app/types/api";
 import { Tooltip } from "@/app/ui/Tooltip";
 
 interface InterpretationCardProps {
@@ -49,7 +52,10 @@ export function InterpretationCard({
       </div>
       <ul className="mt-3 space-y-2">
         {interpretation.bullets.map((bullet) => (
-          <li key={bullet} className="flex gap-2.5 text-sm leading-relaxed text-zinc-600">
+          <li
+            key={bullet}
+            className="flex gap-2.5 text-sm leading-relaxed text-zinc-600"
+          >
             <span className="mt-2 h-1 w-1 flex-none rounded-full bg-zinc-300" />
             <span>{bullet}</span>
           </li>
