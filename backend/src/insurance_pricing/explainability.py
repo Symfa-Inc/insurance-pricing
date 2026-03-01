@@ -6,12 +6,12 @@ import numpy as np
 import pandas as pd
 import shap
 
-from insurance_pricing.schemas.predict import (
+from insurance_pricing.model import RAW_FEATURE_ORDER, payload_to_frame
+from insurance_pricing.schemas import (
     PredictRequest,
     ShapContribution,
     ShapPayload,
 )
-from insurance_pricing.services.predictor import RAW_FEATURE_ORDER, payload_to_frame
 
 SHAP_RANDOM_SEED = 42
 KERNEL_NSAMPLES = 100

@@ -5,8 +5,8 @@ import logging
 
 from openai import OpenAI
 
-from insurance_pricing.schemas.predict import InterpretationPayload, ShapPayload
-from insurance_pricing.settings import Settings
+from insurance_pricing.config import Settings
+from insurance_pricing.schemas import InterpretationPayload, ShapPayload
 
 logger = logging.getLogger(__name__)
 

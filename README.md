@@ -99,6 +99,12 @@ The training/evaluation pipeline includes report generation for both technical a
 insurance-pricing-assistant/
 ├── backend/
 │   ├── src/insurance_pricing/
+│   │   ├── main.py              # FastAPI app, endpoints, lifespan, CORS
+│   │   ├── config.py            # App settings + path resolution
+│   │   ├── schemas.py           # Pydantic request/response models
+│   │   ├── model.py             # Model/transformer loading + prediction
+│   │   ├── explainability.py    # SHAP computation
+│   │   └── interpretation.py    # OpenAI + fallback interpretation
 │   ├── models/
 │   ├── data/
 │   ├── reports/
@@ -156,7 +162,7 @@ export TRANSFORMER_PATH="backend/models/feature_transformer.joblib"
 Backend:
 
 ```bash
-uvicorn insurance_pricing.app.main:app --reload
+uv run uvicorn insurance_pricing.main:app --reload
 ```
 
 Frontend:

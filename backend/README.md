@@ -6,19 +6,19 @@ FastAPI backend for the Insurance Premium Prediction system with ML-powered expl
 
 ```
 backend/
-├── src/insurance_pricing/  # Python package (API code)
-│   ├── api/v1/             # Versioned HTTP endpoints
-│   ├── schemas/            # Pydantic request/response schemas
-│   ├── services/           # Model loading and prediction logic
-│   ├── config.py           # App settings + CORS origins
-│   ├── lifespan.py         # Startup model loading
-│   ├── __init__.py
-│   └── main.py             # FastAPI application
-├── models/                 # Trained ML model artifacts
-├── reports/                # Generated experiment/analysis reports
-├── scripts/                # Training & preprocessing scripts
-├── data/                   # Datasets
-└── pyproject.toml          # Package dependencies
+├── src/insurance_pricing/     # Python package (API code)
+│   ├── __init__.py            # Package version
+│   ├── main.py                # FastAPI app, endpoints, lifespan, CORS
+│   ├── config.py              # App settings + path resolution
+│   ├── schemas.py             # Pydantic request/response models
+│   ├── model.py               # Model/transformer loading + prediction
+│   ├── explainability.py      # SHAP computation
+│   └── interpretation.py      # OpenAI + fallback interpretation
+├── models/                    # Trained ML model artifacts
+├── reports/                   # Generated experiment/analysis reports
+├── scripts/                   # Training & preprocessing scripts
+├── data/                      # Datasets
+└── pyproject.toml             # Package dependencies
 ```
 
 ## 🚀 Quick Start

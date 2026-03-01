@@ -6,10 +6,16 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, field_validator
 
-from insurance_pricing import MODELS_DIR
+PACKAGE_DIR = Path(__file__).resolve().parent
+SRC_DIR = PACKAGE_DIR.parent
+BACKEND_DIR = SRC_DIR.parent
+PROJECT_DIR = BACKEND_DIR.parent
+DATA_DIR = BACKEND_DIR / "data"
+MODELS_DIR = BACKEND_DIR / "models"
+REPORTS_DIR = BACKEND_DIR / "reports"
 
 DEFAULT_CORS_ORIGINS = ("http://localhost:5173", "http://localhost:3000")
-PACKAGE_ENV_FILE = Path(__file__).resolve().parent / ".env"
+PACKAGE_ENV_FILE = PACKAGE_DIR / ".env"
 
 
 def _read_env_file(path: Path) -> dict[str, str]:
