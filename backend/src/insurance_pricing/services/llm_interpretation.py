@@ -120,7 +120,22 @@ def generate_fallback_interpretation(
                 f"{item.feature} ({formatted_value}) had minimal effect on this estimate.",
             )
 
-    while len(bullets) < 3:
+    remaining = ranked[3:]
+    if remaining:
+        remaining_net = sum(item.shap_value for item in remaining)
+        direction = "upward" if remaining_net >= 0 else "downward"
+        bullets.append(
+            f"The remaining features combined for a net {direction} nudge "
+            f"of about ${abs(remaining_net):,.0f}.",
+        )
+
+    gap_direction = "above" if baseline_gap >= 0 else "below"
+    bullets.append(
+        f"Overall, this estimate sits ${abs(baseline_gap):,.0f} {gap_direction} "
+        f"the baseline average, primarily shaped by {driver_names}.",
+    )
+
+    while len(bullets) < 5:
         bullets.append(
             "Smaller remaining features had limited impact compared with the top drivers.",
         )
@@ -128,7 +143,7 @@ def generate_fallback_interpretation(
     return InterpretationPayload.model_validate(
         {
             "headline": headline,
-            "bullets": bullets[:3],
+            "bullets": bullets[:5],
             "caveats": [
                 "This explanation is for this prediction only.",
                 "Contributions reflect model behavior, not causation.",
@@ -184,10 +199,17 @@ def interpret_shap(
         "Focus on the top 3 drivers by absolute SHAP value. "
         "Do not use markdown or HTML. "
         "Keep output concise and informative. "
-        "Write exactly 1 short headline and 3 short bullets. "
-        "Each bullet must mention at least one feature and whether it pushed "
-        "the estimate up or down. "
-        "At least two bullets should include approximate SHAP magnitudes in dollars. "
+        "Write exactly 1 short headline and 5 bullets. "
+        "The first 3 bullets should each cover one top feature: name the feature, "
+        "state its value, say whether it pushed the estimate up or down, include "
+        "the approximate SHAP magnitude in dollars, and briefly explain WHY this "
+        "factor typically affects insurance pricing (e.g., higher health risk, "
+        "regional cost differences, actuarial patterns). "
+        "The 4th bullet should summarize how the remaining features combined "
+        "to nudge the estimate. "
+        "The 5th bullet should give a brief overall takeaway comparing the "
+        "predicted cost to the baseline average and noting the dominant theme "
+        "(e.g., lifestyle-driven, age-driven, region-driven). "
         "Do not repeat prediction_charges or base_value as standalone bullets. "
         "Avoid causal language; describe associations for this one prediction only. "
         "Include caveats that this is a local, model-dependent explanation. "
@@ -209,7 +231,7 @@ def interpret_shap(
             raise RuntimeError("OpenAI returned no structured interpretation payload")
 
         interpretation = InterpretationPayload.model_validate(parsed)
-        interpretation.bullets = _clean_bullets(interpretation.bullets)[:3]
+        interpretation.bullets = _clean_bullets(interpretation.bullets)[:5]
 
         top_feature_names = [item.feature for item in top_three]
         if _is_low_signal_interpretation(
