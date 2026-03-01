@@ -6,19 +6,19 @@ FastAPI backend for the Insurance Premium Prediction system with ML-powered expl
 
 ```
 backend/
-├── src/insurance_pricing/  # Python package (API code)
-│   ├── api/v1/             # Versioned HTTP endpoints
-│   ├── schemas/            # Pydantic request/response schemas
-│   ├── services/           # Model loading and prediction logic
-│   ├── config.py           # App settings + CORS origins
-│   ├── lifespan.py         # Startup model loading
-│   ├── __init__.py
-│   └── main.py             # FastAPI application
-├── models/                 # Trained ML model artifacts
-├── notebooks/              # Jupyter notebooks (EDA, experiments)
-├── scripts/                # Training & preprocessing scripts
-├── data/                   # Datasets
-└── pyproject.toml          # Package dependencies
+├── src/insurance_pricing/     # Python package (API code)
+│   ├── __init__.py            # Package version
+│   ├── main.py                # FastAPI app, endpoints, lifespan, CORS
+│   ├── config.py              # App settings + path resolution
+│   ├── schemas.py             # Pydantic request/response models
+│   ├── model.py               # Model/transformer loading + prediction
+│   ├── explainability.py      # SHAP computation
+│   └── interpretation.py      # OpenAI + fallback interpretation
+├── models/                    # Trained ML model artifacts
+├── reports/                   # Generated experiment/analysis reports
+├── scripts/                   # Training & preprocessing scripts
+├── data/                      # Datasets
+└── pyproject.toml             # Package dependencies
 ```
 
 ## 🚀 Quick Start
@@ -63,9 +63,8 @@ uv run ruff format src/
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/v1/health` | Health check |
-| GET | `/api/v1/version` | App name and version |
-| POST | `/api/v1/predict` | Predict insurance premium |
+| GET | `/health` | Health check |
+| POST | `/predict` | Predict insurance premium |
 
 ## ⚙️ Dependency Note (pyproject-compatible)
 
@@ -82,9 +81,8 @@ numpy
 ## 🧾 Curl Examples
 
 ```bash
-curl http://localhost:8000/api/v1/health
-curl http://localhost:8000/api/v1/version
-curl -X POST http://localhost:8000/api/v1/predict \
+curl http://localhost:8000/health
+curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{
     "age": 41,
@@ -102,8 +100,8 @@ Set a custom artifact path if needed:
 MODEL_PATH=./model.joblib uv run uvicorn insurance_pricing.main:app --reload
 ```
 
-If transforms are stored in a custom path:
+If the feature transformer is stored in a custom path:
 
 ```bash
-TRANSFORM_PARAMS_PATH=./data/transform_params.joblib uv run uvicorn insurance_pricing.main:app --reload
+TRANSFORMER_PATH=./data/feature_transformer.joblib uv run uvicorn insurance_pricing.main:app --reload
 ```

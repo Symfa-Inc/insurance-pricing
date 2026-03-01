@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 End-to-end Exploratory Data Analysis for the US Health Insurance Dataset.
-Writes notebooks/eda_report.md and saves figures to notebooks/_eda_figures/.
+Writes reports/eda_report.md and saves figures to reports/_eda_figures/.
 """
 
 from __future__ import annotations

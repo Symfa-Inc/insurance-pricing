@@ -71,8 +71,8 @@ Reads:
 - `backend/data/source.csv`
 
 Writes:
-- `backend/notebooks/eda_report.md`
-- `backend/notebooks/_eda_figures/*.png`
+- `backend/reports/eda_report.md`
+- `backend/reports/_eda_figures/*.png`
 
 ### `prepare_data.py`
 
@@ -112,7 +112,7 @@ Reads:
 - `backend/data/test.csv`
 
 Writes:
-- `backend/notebooks/evaluation_report.md`
+- `backend/reports/evaluation_report.md`
 
 ## Settings And Environment Variables
 

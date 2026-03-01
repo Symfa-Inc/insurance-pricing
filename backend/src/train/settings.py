@@ -6,7 +6,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from insurance_pricing import DATA_DIR, MODELS_DIR, NOTEBOOKS_DIR
+from insurance_pricing import DATA_DIR, MODELS_DIR, REPORTS_DIR
 
 PACKAGE_ENV_FILE = Path(__file__).resolve().parent / ".env"
 
@@ -35,9 +35,9 @@ class ScriptsSettings(BaseModel):
     test_data_path: Path = DATA_DIR / "test.csv"
     transformer_path: Path = MODELS_DIR / "feature_transformer.joblib"
     predictor_dir: Path = MODELS_DIR / "ag_insurance"
-    evaluation_report_path: Path = NOTEBOOKS_DIR / "evaluation_report.md"
-    eda_report_path: Path = NOTEBOOKS_DIR / "eda_report.md"
-    eda_figures_dir: Path = NOTEBOOKS_DIR / "_eda_figures"
+    evaluation_report_path: Path = REPORTS_DIR / "evaluation_report.md"
+    eda_report_path: Path = REPORTS_DIR / "eda_report.md"
+    eda_figures_dir: Path = REPORTS_DIR / "_eda_figures"
     default_time_limit: int = 300
     default_num_bag_folds: int = 5
     default_num_bag_sets: int = 1
@@ -83,10 +83,7 @@ class ScriptsSettings(BaseModel):
             transformer_path=Path(
                 env_required(
                     "TRANSFORMER_PATH",
-                    env_required(
-                        "TRANSFORM_PARAMS_PATH",
-                        str(cls.model_fields["transformer_path"].default),
-                    ),
+                    str(cls.model_fields["transformer_path"].default),
                 ),
             ),
             predictor_dir=Path(

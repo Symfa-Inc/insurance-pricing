@@ -11,11 +11,6 @@ export interface PredictRequest {
   region: Region;
 }
 
-export interface FeatureImportanceItem {
-  name: string;
-  value: number;
-}
-
 export interface ShapContribution {
   feature: string;
   value: string | number;
@@ -42,13 +37,15 @@ export interface InterpretationPayload {
   top_features: InterpretationTopFeature[];
 }
 
+export type InterpretationSource = "fallback" | "OPENAI";
+
 export interface PredictResponse {
   charges: number;
   model_version?: string;
   extrapolation_warnings?: string[];
   shap?: ShapPayload;
   interpretation?: InterpretationPayload;
+  interpretation_source?: InterpretationSource | null;
   explainability_error?: string | null;
   llm_error?: string | null;
-  feature_importance?: FeatureImportanceItem[];
 }

@@ -1,80 +1,103 @@
-import type {
-  FeatureFormValues,
-  FeatureSchema,
-} from "@/app/config/features";
+import type { FeatureFormValues, FeatureSchema } from "@/app/config/features";
 
 interface FeaturePanelProps {
-  title: string;
   features: readonly FeatureSchema[];
   values: FeatureFormValues;
   onChange: (id: FeatureSchema["id"], nextValue: string) => void;
   onSubmit: () => void;
   isSubmitting: boolean;
   submitDisabled: boolean;
-  errorMessage?: string | null;
+}
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export function FeaturePanel({
-  title,
   features,
   values,
   onChange,
   onSubmit,
   isSubmitting,
   submitDisabled,
-  errorMessage = null,
 }: FeaturePanelProps) {
   return (
-    <aside className="w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:w-72">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{title}</p>
-      <div className="mt-5 space-y-5">
+    <div className="space-y-5">
+      <div className="space-y-4">
         {features.map((feature) => (
-          <label
-            key={feature.id}
-            htmlFor={feature.id}
-            className="block space-y-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-3"
-          >
-            <span className="block text-sm font-medium text-slate-700">
+          <div key={feature.id} className="space-y-1.5">
+            <label
+              htmlFor={feature.id}
+              className="block text-xs font-medium text-zinc-500"
+            >
               {feature.label}
-            </span>
+            </label>
             {feature.type === "number" ? (
               <input
                 id={feature.id}
                 type="number"
                 value={values[feature.id]}
                 placeholder={feature.placeholder}
-                onChange={(event) => onChange(feature.id, event.target.value)}
-                className="block w-full rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 tabular-nums focus:border-slate-400 focus:outline-none"
+                step={feature.step}
+                min={feature.min}
+                max={feature.max}
+                onChange={(e) => onChange(feature.id, e.target.value)}
+                className="block w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-300 transition-colors focus:border-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
               />
             ) : (
-              <select
-                id={feature.id}
-                value={values[feature.id]}
-                onChange={(event) => onChange(feature.id, event.target.value)}
-                className="block w-full rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              >
-                {feature.options.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white transition-colors focus-within:border-zinc-900 focus-within:ring-1 focus-within:ring-zinc-900">
+                <select
+                  id={feature.id}
+                  value={values[feature.id]}
+                  onChange={(e) => onChange(feature.id, e.target.value)}
+                  className="field block w-full rounded-none border-none bg-transparent px-3 py-2 text-sm text-zinc-900 focus:outline-none"
+                >
+                  {feature.options.map((option) => (
+                    <option key={option} value={option}>
+                      {capitalize(option)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             )}
-            {"help" in feature && feature.help ? (
-              <p className="text-xs text-slate-500">{feature.help}</p>
-            ) : null}
-          </label>
+          </div>
         ))}
       </div>
+
       <button
         type="button"
         onClick={onSubmit}
         disabled={isSubmitting || submitDisabled}
-        className="mt-6 w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {isSubmitting ? "Estimating..." : "Estimate"}
+        {isSubmitting ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg
+              className="h-4 w-4 animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                className="opacity-20"
+              />
+              <path
+                d="M12 2a10 10 0 0 1 10 10"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+            </svg>
+            Estimating
+          </span>
+        ) : (
+          "Estimate"
+        )}
       </button>
-      {errorMessage ? <p className="mt-3 text-xs font-medium text-rose-600">{errorMessage}</p> : null}
-    </aside>
+    </div>
   );
 }

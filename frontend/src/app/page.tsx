@@ -37,7 +37,16 @@ function toPredictRequest(
         }
         const parsed = Number(rawValue);
         if (!Number.isFinite(parsed)) {
-          return { payload: null, error: `${feature.label} must be a valid number.` };
+          return {
+            payload: null,
+            error: `${feature.label} must be a valid number.`,
+          };
+        }
+        if (!Number.isInteger(parsed) || parsed < 18 || parsed > 64) {
+          return {
+            payload: null,
+            error: `${feature.label} must be an integer between 18 and 64.`,
+          };
         }
         payload.age = parsed;
         break;
@@ -48,7 +57,16 @@ function toPredictRequest(
         }
         const parsed = Number(rawValue);
         if (!Number.isFinite(parsed)) {
-          return { payload: null, error: `${feature.label} must be a valid number.` };
+          return {
+            payload: null,
+            error: `${feature.label} must be a valid number.`,
+          };
+        }
+        if (parsed < 15 || parsed > 53) {
+          return {
+            payload: null,
+            error: `${feature.label} must be between 15 and 53.`,
+          };
         }
         payload.bmi = parsed;
         break;
@@ -59,7 +77,16 @@ function toPredictRequest(
         }
         const parsed = Number(rawValue);
         if (!Number.isFinite(parsed)) {
-          return { payload: null, error: `${feature.label} must be a valid number.` };
+          return {
+            payload: null,
+            error: `${feature.label} must be a valid number.`,
+          };
+        }
+        if (!Number.isInteger(parsed) || parsed < 0 || parsed > 6) {
+          return {
+            payload: null,
+            error: `${feature.label} must be an integer between 0 and 6.`,
+          };
         }
         payload.children = parsed;
         break;
@@ -98,16 +125,22 @@ export default function Home() {
     createInitialFeatureValues(FEATURE_SCHEMA),
   );
   const [result, setResult] = useState<PredictResponse | null>(null);
-  const [status, setStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "pending" | "success" | "error"
+  >("idle");
   const [error, setError] = useState<string | null>(null);
-  const [lastSubmittedFingerprint, setLastSubmittedFingerprint] = useState<string | null>(null);
+  const [lastSubmittedFingerprint, setLastSubmittedFingerprint] = useState<
+    string | null
+  >(null);
   const currentFingerprint = useMemo(
     () => createInputFingerprint(featureValues, FEATURE_SCHEMA),
     [featureValues],
   );
   const isSubmitting = status === "pending";
   const submitDisabled =
-    isSubmitting || (lastSubmittedFingerprint !== null && lastSubmittedFingerprint === currentFingerprint);
+    isSubmitting ||
+    (lastSubmittedFingerprint !== null &&
+      lastSubmittedFingerprint === currentFingerprint);
 
   const handleFeatureChange = (id: FeatureSchema["id"], nextValue: string) => {
     setFeatureValues((previous) => ({
@@ -121,7 +154,10 @@ export default function Home() {
     setStatus("pending");
     setError(null);
     setResult(null);
-    const { payload, error: validationError } = toPredictRequest(featureValues, FEATURE_SCHEMA);
+    const { payload, error: validationError } = toPredictRequest(
+      featureValues,
+      FEATURE_SCHEMA,
+    );
 
     if (!payload) {
       setError(validationError ?? "Please review your inputs.");
@@ -140,27 +176,22 @@ export default function Home() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-slate-50 text-slate-900"
-      style={{
-        backgroundImage:
-          "radial-gradient(circle at top left, rgba(99,102,241,0.14), transparent 45%), radial-gradient(circle at 30% 20%, rgba(99,102,241,0.12), transparent 40%), radial-gradient(circle at 90% 10%, rgba(148,163,184,0.16), transparent 45%)",
-      }}
-    >
-      <main className="mx-auto min-h-screen w-full max-w-6xl space-y-8 px-6 py-10">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900">
+      <main className="mx-auto w-full max-w-5xl px-6 py-10">
         <PageIntro />
 
-        <section className="flex flex-col gap-8 md:flex-row md:items-start">
-          <div className="w-full md:w-72 md:flex-none">
-            <FeaturePanel
-              title="Feature inputs"
-              features={FEATURE_SCHEMA}
-              values={featureValues}
-              onChange={handleFeatureChange}
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-              submitDisabled={submitDisabled}
-            />
+        <section className="mt-8 flex flex-col gap-6 md:flex-row md:items-start">
+          <div className="w-full md:w-60 md:flex-none">
+            <div className="rounded-xl border border-zinc-100 bg-white p-5 shadow-sm">
+              <FeaturePanel
+                features={FEATURE_SCHEMA}
+                values={featureValues}
+                onChange={handleFeatureChange}
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+                submitDisabled={submitDisabled}
+              />
+            </div>
           </div>
 
           <div className="w-full flex-1">

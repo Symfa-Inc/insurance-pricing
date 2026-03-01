@@ -4,25 +4,29 @@
 
 # Insurance Pricing Assistant
 
-[![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
-[![TypeScript 5+](https://img.shields.io/badge/TypeScript-5%2B-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-Framework-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Next.js](https://img.shields.io/badge/Next.js-App-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![AutoGluon](https://img.shields.io/badge/AutoGluon-Tabular-2C7BE5)](https://auto.gluon.ai/stable/)
-[![SHAP](https://img.shields.io/badge/SHAP-Explainability-111111)](https://shap.readthedocs.io/)
-[![OpenAI](https://img.shields.io/badge/OpenAI-LLM-412991?logo=openai&logoColor=white)](https://platform.openai.com/)
-[![Docker](https://img.shields.io/badge/Docker-Optional-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Python 3.13](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/downloads/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6.svg)](https://www.typescriptlang.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
+[![AutoGluon](https://img.shields.io/badge/AutoGluon-Tabular-2C7BE5.svg)](https://auto.gluon.ai/stable/)
+[![SHAP](https://img.shields.io/badge/SHAP-Explainability-111111.svg)](https://shap.readthedocs.io/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--5-10a37f.svg)](https://platform.openai.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
 **A full-stack ML application for estimating annual insurance charges with transparent, human-readable prediction explanations.**
 
-[Live Demo (Optional)](#) • [API Docs](http://localhost:8000/docs) • [GitHub Repository](https://github.com/your-org/insurance-pricing-assistant)
+🔗 **Live Demo**: *TODO*
+
+💻 **GitHub**: [https://github.com/Symfa-Inc/insurance-pricing](https://github.com/Symfa-Inc/insurance-pricing)
+
+📘 **Confluence**: [https://symfa.atlassian.net/wiki/x/AQBjLQE](https://symfa.atlassian.net/wiki/x/AQBjLQE)
 
 </div>
 
 ## Overview
 
-Insurance Pricing Assistant predicts annual insurance charges from customer profile inputs through a FastAPI backend and a modern Next.js frontend.  
+Insurance Pricing Assistant predicts annual insurance charges from customer profile inputs through a FastAPI backend and a modern Next.js frontend.
 Beyond returning a numeric estimate, each prediction includes model transparency signals (SHAP feature contributions) and an LLM-generated interpretation so users can understand the likely drivers behind the result.
 
 The project also includes an evaluation stage that generates Markdown artifacts (`eda_report.md` and `evaluation_report.md`) for reproducible model analysis and communication.
@@ -90,8 +94,8 @@ The training/evaluation pipeline includes report generation for both technical a
 - The evaluation stage uses an LLM step to generate plain-language interpretation of metric outcomes.
 - `backend/src/train/stages/run_eda.py` produces exploratory data insights.
 - Outputs are generated as Markdown files:
-  - `backend/notebooks/eda_report.md`
-  - `backend/notebooks/evaluation_report.md`
+  - `backend/reports/eda_report.md`
+  - `backend/reports/evaluation_report.md`
 
 ## Project Structure
 
@@ -99,12 +103,19 @@ The training/evaluation pipeline includes report generation for both technical a
 insurance-pricing-assistant/
 ├── backend/
 │   ├── src/insurance_pricing/
+│   │   ├── main.py              # FastAPI app, endpoints, lifespan, CORS
+│   │   ├── config.py            # App settings + path resolution
+│   │   ├── schemas.py           # Pydantic request/response models
+│   │   ├── model.py             # Model/transformer loading + prediction
+│   │   ├── explainability.py    # SHAP computation
+│   │   └── interpretation.py    # OpenAI + fallback interpretation
 │   ├── models/
 │   ├── data/
-│   ├── notebooks/
+│   ├── reports/
+│   ├── Dockerfile
 │   └── pyproject.toml
 ├── frontend/
-├── Dockerfile
+│   └── Dockerfile
 └── README.md
 ```
 
@@ -156,7 +167,8 @@ export TRANSFORMER_PATH="backend/models/feature_transformer.joblib"
 Backend:
 
 ```bash
-uvicorn insurance_pricing.app.main:app --reload
+cd backend
+uv run uvicorn insurance_pricing.main:app --reload
 ```
 
 Frontend:
@@ -173,5 +185,5 @@ Local URLs:
 
 ## License
 
-This project is licensed under the Apache License 2.0.  
+This project is licensed under the Apache License 2.0.
 See `LICENSE` for details.
