@@ -18,6 +18,21 @@ function sourceBadgeClass(source: InterpretationSource): string {
   return "border-emerald-200 bg-emerald-50 text-emerald-700";
 }
 
+function BulletText({ text }: { text: string }) {
+  const colonIndex = text.indexOf(":");
+  if (colonIndex > 0 && colonIndex < 40) {
+    return (
+      <span>
+        <strong className="font-semibold text-zinc-800">
+          {text.slice(0, colonIndex + 1)}
+        </strong>
+        {text.slice(colonIndex + 1)}
+      </span>
+    );
+  }
+  return <span>{text}</span>;
+}
+
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -57,7 +72,7 @@ export function InterpretationCard({
             className="flex gap-2.5 text-sm leading-relaxed text-zinc-600"
           >
             <span className="mt-2 h-1 w-1 flex-none rounded-full bg-zinc-300" />
-            <span>{bullet}</span>
+            <BulletText text={bullet} />
           </li>
         ))}
       </ul>
