@@ -11,7 +11,7 @@
 [![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
 [![AutoGluon](https://img.shields.io/badge/AutoGluon-Tabular-2C7BE5.svg)](https://auto.gluon.ai/stable/)
 [![SHAP](https://img.shields.io/badge/SHAP-Explainability-111111.svg)](https://shap.readthedocs.io/)
-[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-10a37f.svg)](https://platform.openai.com/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--5-10a37f.svg)](https://platform.openai.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
 **A full-stack ML application for estimating annual insurance charges with transparent, human-readable prediction explanations.**
