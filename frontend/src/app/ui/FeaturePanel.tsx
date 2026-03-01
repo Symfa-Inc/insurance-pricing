@@ -45,18 +45,20 @@ export function FeaturePanel({
                 className="block w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-300 transition-colors focus:border-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
               />
             ) : (
-              <select
-                id={feature.id}
-                value={values[feature.id]}
-                onChange={(e) => onChange(feature.id, e.target.value)}
-                className="field block w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 transition-colors focus:border-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
-              >
-                {feature.options.map((option) => (
-                  <option key={option} value={option}>
-                    {capitalize(option)}
-                  </option>
-                ))}
-              </select>
+              <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white transition-colors focus-within:border-zinc-900 focus-within:ring-1 focus-within:ring-zinc-900">
+                <select
+                  id={feature.id}
+                  value={values[feature.id]}
+                  onChange={(e) => onChange(feature.id, e.target.value)}
+                  className="field block w-full rounded-none border-none bg-transparent px-3 py-2 text-sm text-zinc-900 focus:outline-none"
+                >
+                  {feature.options.map((option) => (
+                    <option key={option} value={option}>
+                      {capitalize(option)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             )}
           </div>
         ))}

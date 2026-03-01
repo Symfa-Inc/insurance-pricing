@@ -5,7 +5,7 @@ export function PageIntro() {
         Insurance Pricing
       </h1>
       <p className="mt-1 text-sm text-zinc-500">
-        Estimate annual charges based on your profile.
+        Estimate insurance costs with ML-powered predictions and explainable AI insights
       </p>
     </header>
   );

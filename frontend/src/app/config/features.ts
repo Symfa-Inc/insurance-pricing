@@ -76,7 +76,7 @@ export const FEATURE_SCHEMA: readonly FeatureSchema[] = [
     id: "children",
     type: "number",
     label: "Children",
-    defaultValue: 0,
+    defaultValue: 1,
     placeholder: "e.g. 2",
     help: "Number of dependents",
     step: 1,
@@ -88,7 +88,7 @@ export const FEATURE_SCHEMA: readonly FeatureSchema[] = [
     type: "select",
     label: "Smoker",
     options: SMOKER_OPTIONS,
-    defaultValue: "no",
+    defaultValue: "yes",
   },
   {
     id: "region",
