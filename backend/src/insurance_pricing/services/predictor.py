@@ -7,30 +7,7 @@ import pandas as pd
 
 from insurance_pricing.schemas.predict import PredictRequest
 
-SEX_MAP = {"female": 0.0, "male": 1.0}
-SMOKER_MAP = {"no": 0.0, "yes": 1.0}
-REGION_MAP = {
-    "northeast": 0.0,
-    "northwest": 1.0,
-    "southeast": 2.0,
-    "southwest": 3.0,
-}
 RAW_FEATURE_ORDER = ("age", "sex", "bmi", "children", "smoker", "region")
-
-
-def preprocess_features(payload: PredictRequest) -> np.ndarray:
-    # Kept for backward compatibility in case older model expects raw numeric vector.
-    return np.asarray(
-        [
-            float(payload.age),
-            SEX_MAP[payload.sex],
-            float(payload.bmi),
-            float(payload.children),
-            SMOKER_MAP[payload.smoker],
-            REGION_MAP[payload.region],
-        ],
-        dtype=float,
-    )
 
 
 def check_extrapolation(

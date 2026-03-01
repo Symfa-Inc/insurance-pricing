@@ -7,7 +7,6 @@ interface FeaturePanelProps {
   onSubmit: () => void;
   isSubmitting: boolean;
   submitDisabled: boolean;
-  errorMessage?: string | null;
 }
 
 function capitalize(s: string): string {
@@ -21,7 +20,6 @@ export function FeaturePanel({
   onSubmit,
   isSubmitting,
   submitDisabled,
-  errorMessage = null,
 }: FeaturePanelProps) {
   return (
     <div className="space-y-5">
@@ -98,10 +96,6 @@ export function FeaturePanel({
           "Estimate"
         )}
       </button>
-
-      {errorMessage && (
-        <p className="text-xs font-medium text-red-600">{errorMessage}</p>
-      )}
     </div>
   );
 }

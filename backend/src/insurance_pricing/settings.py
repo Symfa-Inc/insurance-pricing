@@ -78,10 +78,7 @@ class Settings(BaseModel):
             transformer_path=Path(
                 env_required(
                     "TRANSFORMER_PATH",
-                    env_required(
-                        "TRANSFORM_PARAMS_PATH",
-                        str(cls.model_fields["transformer_path"].default),
-                    ),
+                    str(cls.model_fields["transformer_path"].default),
                 ),
             ),
             cors_origins=env_required("CORS_ORIGINS", ",".join(DEFAULT_CORS_ORIGINS)),

@@ -83,10 +83,7 @@ class ScriptsSettings(BaseModel):
             transformer_path=Path(
                 env_required(
                     "TRANSFORMER_PATH",
-                    env_required(
-                        "TRANSFORM_PARAMS_PATH",
-                        str(cls.model_fields["transformer_path"].default),
-                    ),
+                    str(cls.model_fields["transformer_path"].default),
                 ),
             ),
             predictor_dir=Path(

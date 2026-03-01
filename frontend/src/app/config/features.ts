@@ -12,7 +12,7 @@ interface BaseFeatureSchema<
   label: string;
 }
 
-export interface NumericFeatureSchema<
+interface NumericFeatureSchema<
   I extends FeatureId = FeatureId,
 > extends BaseFeatureSchema<I, "number"> {
   defaultValue: number;
@@ -23,7 +23,7 @@ export interface NumericFeatureSchema<
   max?: number;
 }
 
-export interface SelectFeatureSchema<
+interface SelectFeatureSchema<
   I extends FeatureId = FeatureId,
   O extends string = string,
 > extends BaseFeatureSchema<I, "select"> {

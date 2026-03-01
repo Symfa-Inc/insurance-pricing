@@ -100,8 +100,8 @@ Set a custom artifact path if needed:
 MODEL_PATH=./model.joblib uv run uvicorn insurance_pricing.main:app --reload
 ```
 
-If transforms are stored in a custom path:
+If the feature transformer is stored in a custom path:
 
 ```bash
-TRANSFORM_PARAMS_PATH=./data/transform_params.joblib uv run uvicorn insurance_pricing.main:app --reload
+TRANSFORMER_PATH=./data/feature_transformer.joblib uv run uvicorn insurance_pricing.main:app --reload
 ```

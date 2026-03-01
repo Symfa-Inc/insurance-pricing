@@ -11,11 +11,6 @@ export interface PredictRequest {
   region: Region;
 }
 
-export interface FeatureImportanceItem {
-  name: string;
-  value: number;
-}
-
 export interface ShapContribution {
   feature: string;
   value: string | number;
@@ -53,5 +48,4 @@ export interface PredictResponse {
   interpretation_source?: InterpretationSource | null;
   explainability_error?: string | null;
   llm_error?: string | null;
-  feature_importance?: FeatureImportanceItem[];
 }
