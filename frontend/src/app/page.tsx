@@ -180,7 +180,7 @@ export default function Home() {
       <main className="mx-auto w-full max-w-5xl px-6 py-10">
         <PageIntro />
 
-        <section className="mt-8 flex flex-col gap-6 md:flex-row md:items-start">
+        <section className="mt-8 flex flex-col gap-6 md:flex-row md:items-stretch">
           <div className="w-full md:w-60 md:flex-none">
             <div className="rounded-xl border border-zinc-100 bg-white p-5 shadow-sm">
               <FeaturePanel

@@ -57,3 +57,63 @@ select.field {
 .animate-fade-in-up {
   animation: fade-in-up 0.4s ease-out both;
 }
+
+/* Pulse ring animation */
+.pulse-ring {
+  width: 76px;
+  height: 76px;
+  min-width: 76px;
+  min-height: 76px;
+  border-radius: 50%;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(26, 43, 60, 0.18) !important;
+  box-shadow:
+    0 0 0 1px rgba(26, 43, 60, 0.06),
+    0 0 16px rgba(26, 43, 60, 0.06);
+  position: relative;
+  overflow: visible;
+}
+
+.pulse-ring::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(26, 43, 60, 0.16) !important;
+  animation: pulse 2.3s ease-in-out infinite;
+}
+
+.pulse-ring::after {
+  content: "";
+  position: absolute;
+  inset: 21px;
+  border-radius: 50%;
+  background: rgba(26, 43, 60, 0.14);
+  box-shadow: 0 0 10px rgba(26, 43, 60, 0.1);
+  animation: pulse-core 2.3s 0.3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.26;
+  }
+  50% {
+    transform: scale(1.26);
+    opacity: 0.82;
+  }
+}
+
+@keyframes pulse-core {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.32;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.78;
+  }
+}

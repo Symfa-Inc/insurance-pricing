@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { FeatureFormValues, FeatureSchema } from "@/app/config/features";
 
 interface FeaturePanelProps {
@@ -21,8 +22,41 @@ export function FeaturePanel({
   isSubmitting,
   submitDisabled,
 }: FeaturePanelProps) {
+  const formRef = useRef<HTMLDivElement>(null);
+
+  /* Scroll wheel adjusts number inputs without scrolling the page */
+  useEffect(() => {
+    const el = formRef.current;
+    if (!el) return;
+
+    const handler = (e: WheelEvent) => {
+      const input = (e.target as HTMLElement).closest(
+        'input[type="number"]',
+      ) as HTMLInputElement | null;
+      if (!input) return;
+      e.preventDefault();
+
+      const id = input.id as FeatureSchema["id"];
+      const step = parseFloat(input.step) || 1;
+      const min = input.min !== "" ? parseFloat(input.min) : -Infinity;
+      const max = input.max !== "" ? parseFloat(input.max) : Infinity;
+      const current = parseFloat(input.value) || 0;
+      const direction = e.deltaY < 0 ? 1 : -1;
+      const decimals = Math.max((input.step.split(".")[1] || "").length, 0);
+      const next = Math.min(
+        max,
+        Math.max(min, parseFloat((current + direction * step).toFixed(decimals))),
+      );
+
+      onChange(id, String(next));
+    };
+
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, [onChange]);
+
   return (
-    <div className="space-y-5">
+    <div ref={formRef} className="space-y-5">
       <div className="space-y-4">
         {features.map((feature) => (
           <div key={feature.id} className="space-y-1.5">

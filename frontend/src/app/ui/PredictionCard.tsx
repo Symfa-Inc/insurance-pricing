@@ -29,7 +29,8 @@ export function PredictionCard({ result, status, error }: PredictionCardProps) {
 
   if (status === "idle") {
     return (
-      <div className="flex h-full min-h-48 items-center justify-center rounded-xl border border-dashed border-zinc-200 p-12">
+      <div className="flex h-full min-h-48 flex-col items-center justify-center gap-5 rounded-xl border border-zinc-100 bg-white p-12 shadow-sm">
+        <div className="pulse-ring shrink-0" />
         <p className="text-sm text-zinc-400">
           Enter your details and click Estimate
         </p>
