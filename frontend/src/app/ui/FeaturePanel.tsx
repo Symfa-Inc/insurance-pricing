@@ -45,7 +45,10 @@ export function FeaturePanel({
       const decimals = Math.max((input.step.split(".")[1] || "").length, 0);
       const next = Math.min(
         max,
-        Math.max(min, parseFloat((current + direction * step).toFixed(decimals))),
+        Math.max(
+          min,
+          parseFloat((current + direction * step).toFixed(decimals)),
+        ),
       );
 
       onChange(id, String(next));
