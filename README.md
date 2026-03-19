@@ -43,6 +43,12 @@ This repository is intended as an ML demonstration system and product prototype,
 - **Modern Interactive UI:** Next.js + React + Tailwind user interface for interactive scoring.
 - **API-First Backend:** FastAPI service designed for frontend and programmatic clients.
 
+### Preview
+
+<p align="center">
+  <img src=".assets/insurance-pricing.png" width="70%" alt="Insurance Pricing Assistant – prediction interface with SHAP explainability">
+</p>
+
 ## Tech Stack
 
 | Category | Technologies |
