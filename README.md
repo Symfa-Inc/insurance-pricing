@@ -16,11 +16,11 @@
 
 **A full-stack ML application for estimating annual insurance charges with transparent, human-readable prediction explanations.**
 
-🔗 **Live Demo**: *TODO*
+🔗 **Live Demo**: [insurance-pricing.symfa.ai](https://insurance-pricing.symfa.ai/)
 
-💻 **GitHub**: [https://github.com/Symfa-Inc/insurance-pricing](https://github.com/Symfa-Inc/insurance-pricing)
+💻 **GitHub**: [Symfa-Inc/insurance-pricing](https://github.com/Symfa-Inc/insurance-pricing)
 
-📘 **Confluence**: [https://symfa.atlassian.net/wiki/x/AQBjLQE](https://symfa.atlassian.net/wiki/x/AQBjLQE)
+📘 **Confluence**: [Project Description](https://symfa.atlassian.net/wiki/x/AQBjLQE)
 
 </div>
 
@@ -60,7 +60,7 @@ This repository is intended as an ML demonstration system and product prototype,
 | LLM | OpenAI API (structured interpretation generation) |
 | Data Processing | pandas, NumPy |
 | Package Management | uv (Python), pnpm (Node.js) |
-| Deployment | Local runtime, Docker-optional workflows |
+| Deployment | Docker, GitHub Actions, Google Artifact Registry, Portainer |
 
 ## Architecture
 
@@ -106,7 +106,7 @@ The training/evaluation pipeline includes report generation for both technical a
 ## Project Structure
 
 ```text
-insurance-pricing-assistant/
+insurance-pricing/
 ├── backend/
 │   ├── src/insurance_pricing/
 │   │   ├── main.py              # FastAPI app, endpoints, lifespan, CORS
@@ -121,18 +121,18 @@ insurance-pricing-assistant/
 │   ├── Dockerfile
 │   └── pyproject.toml
 ├── frontend/
-│   └── Dockerfile
+│   ├── Dockerfile
+│   └── docker-entrypoint.sh
+├── insurance-pricing-portainer-stack.txt
 └── README.md
 ```
-
-> Note: If Docker is not used in your local setup yet, treat `Dockerfile` as an optional deployment artifact placeholder.
 
 ## Getting Started
 
 ### Prerequisites
 
 - Python 3.13+
-- Node.js 18+
+- Node.js 24+
 - [uv](https://github.com/astral-sh/uv)
 - [pnpm](https://pnpm.io/)
 - OpenAI API key
@@ -141,8 +141,8 @@ insurance-pricing-assistant/
 
 ```bash
 # Clone and enter project root
-git clone https://github.com/your-org/insurance-pricing-assistant.git
-cd insurance-pricing-assistant
+git clone https://github.com/Symfa-Inc/insurance-pricing.git
+cd insurance-pricing
 
 # Install Python dependencies (workspace)
 uv sync
@@ -168,6 +168,12 @@ export MODEL_PATH="backend/models/ag_insurance"
 export TRANSFORMER_PATH="backend/models/feature_transformer.joblib"
 ```
 
+Optional frontend API override for local development:
+
+```bash
+export NEXT_PUBLIC_API_BASE_URL="http://localhost:8000"
+```
+
 ### Running Locally
 
 Backend:
@@ -188,6 +194,26 @@ Local URLs:
 
 - API docs: http://localhost:8000/docs
 - Frontend app: http://localhost:3000
+
+## Running with Docker
+
+Backend:
+
+```bash
+cd backend
+docker build -t insurance-pricing-backend .
+docker run -p 8000:8000 -e OPENAI_API_KEY="$OPENAI_API_KEY" insurance-pricing-backend
+```
+
+Frontend:
+
+```bash
+cd frontend
+docker build -t insurance-pricing-frontend .
+docker run -p 3000:3000 -e API_URL=http://localhost:8000 insurance-pricing-frontend
+```
+
+For deployed environments, set `API_URL` to `https://api-insurance-pricing.symfa.ai`.
 
 ## License
 

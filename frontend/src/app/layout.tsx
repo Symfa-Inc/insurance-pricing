@@ -13,9 +13,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://insurance-pricing.symfa.ai"),
   title: "Insurance Pricing",
   description:
     "Estimate insurance costs with ML-powered predictions and explainable AI insights",
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/icon.png" }],
+    shortcut: ["/favicon.ico"],
+  },
   keywords: [
     "insurance pricing",
     "machine learning",
