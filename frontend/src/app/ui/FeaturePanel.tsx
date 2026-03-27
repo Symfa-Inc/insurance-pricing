@@ -105,7 +105,7 @@ export function FeaturePanel({
         type="button"
         onClick={onSubmit}
         disabled={isSubmitting || submitDisabled}
-        className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+        className="w-full cursor-pointer rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
       >
         {isSubmitting ? (
           <span className="flex items-center justify-center gap-2">

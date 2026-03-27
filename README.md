@@ -16,14 +16,14 @@
 
 Full-stack ML application for estimating annual insurance charges with SHAP-based explainability and LLM-powered interpretation.
 
-**[Live Demo](https://insurance-pricing.symfa.ai/)** · **[GitHub](https://github.com/Symfa-Inc/insurance-pricing)** · **[Confluence](https://symfa.atlassian.net/wiki/spaces/SYMFA/pages/5012094986)**
+**[Live Demo](https://insurance-pricing.symfa.ai/)** · **[GitHub](https://github.com/Symfa-Inc/insurance-pricing)** · **[Confluence](https://symfa.atlassian.net/wiki/x/AQBjLQE)**
 
 </div>
 
 ## Preview
 
 <p align="center">
-<img src=".assets/insurance-pricing.png" width="100%" alt="Insurance Pricing Preview">
+<img src=".assets/insurance-pricing.png" width="80%" alt="Insurance Pricing Preview">
 </p>
 
 ## Features
