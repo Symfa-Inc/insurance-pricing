@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src=".assets/logo.png" width="100" alt="Project Logo">
+<img src=".assets/logo.png" width="100" alt="Insurance Pricing Logo">
 
 # Insurance Pricing Assistant
 
@@ -14,208 +14,66 @@
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--5-10a37f.svg)](https://platform.openai.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
-**A full-stack ML application for estimating annual insurance charges with transparent, human-readable prediction explanations.**
+Full-stack ML application for estimating annual insurance charges with SHAP-based explainability and LLM-powered interpretation.
 
-🔗 **Live Demo**: [insurance-pricing.symfa.ai](https://insurance-pricing.symfa.ai/)
-
-💻 **GitHub**: [Symfa-Inc/insurance-pricing](https://github.com/Symfa-Inc/insurance-pricing)
-
-📘 **Confluence**: [Project Description](https://symfa.atlassian.net/wiki/x/AQBjLQE)
+**[Live Demo](https://insurance-pricing.symfa.ai/)** · **[GitHub](https://github.com/Symfa-Inc/insurance-pricing)** · **[Confluence](https://symfa.atlassian.net/wiki/spaces/SYMFA/pages/5012094986)**
 
 </div>
 
-## Overview
-
-Insurance Pricing Assistant predicts annual insurance charges from customer profile inputs through a FastAPI backend and a modern Next.js frontend.
-Beyond returning a numeric estimate, each prediction includes model transparency signals (SHAP feature contributions) and an LLM-generated interpretation so users can understand the likely drivers behind the result.
-
-The project also includes an evaluation stage that generates Markdown artifacts (`eda_report.md` and `evaluation_report.md`) for reproducible model analysis and communication.
-
-This repository is intended as an ML demonstration system and product prototype, not financial, underwriting, or actuarial advice.
-
-## Key Features
-
-- **Insurance Charges Prediction:** AutoGluon tabular regression for annual charges estimation.
-- **SHAP-Based Explainability:** Per-prediction feature contribution outputs.
-- **LLM-Powered Interpretation:** Human-readable explanation of model behavior for each prediction.
-- **Model Evaluation Reports:** R², MAPE, and SMAPE reporting with business-oriented interpretation.
-- **EDA Report Generation:** Exploratory data analysis report generation in Markdown.
-- **Modern Interactive UI:** Next.js + React + Tailwind user interface for interactive scoring.
-- **API-First Backend:** FastAPI service designed for frontend and programmatic clients.
-
-### Preview
+## Preview
 
 <p align="center">
-  <img src=".assets/insurance-pricing.png" width="70%" alt="Insurance Pricing Assistant – prediction interface with SHAP explainability">
+<img src=".assets/insurance-pricing.png" width="100%" alt="Insurance Pricing Preview">
 </p>
+
+## Features
+
+- **Insurance Charges Prediction** – AutoGluon tabular regression estimating annual insurance costs from demographic and health factors
+- **SHAP Explainability** – Per-prediction feature contributions showing how each input affects the estimated charge
+- **LLM Interpretation** – Human-readable explanation of predictions with headline, key factors, and caveats via OpenAI
+- **Extrapolation Warnings** – Alerts when input values fall outside the model's training distribution
+- **Model Evaluation** – Built-in reports with R², MAPE, and SMAPE metrics and business interpretation
+- **EDA Reports** – Automated exploratory data analysis with visualizations in Markdown format
+
+## How It Works
+
+The system uses an AutoGluon TabularPredictor trained on the US Health Insurance Dataset (1,300 records with age, sex, BMI, children, smoker status, and region). When a user submits parameters, the backend runs the prediction, checks for extrapolation beyond training bounds, computes SHAP feature contributions using a TreeExplainer, and generates a structured interpretation via GPT-4o-mini. The interpretation includes a headline, bullet-point explanations of key cost drivers, and caveats about model limitations.
 
 ## Tech Stack
 
 | Category | Technologies |
-|---|---|
-| Backend | Python 3.13, FastAPI, Pydantic, Uvicorn |
+|----------|-------------|
+| Backend | Python 3.13, FastAPI, Uvicorn |
 | Frontend | TypeScript, Next.js, React, Tailwind CSS |
-| ML | AutoGluon (TabularPredictor), scikit-learn |
-| Explainability | SHAP |
-| LLM | OpenAI API (structured interpretation generation) |
-| Data Processing | pandas, NumPy |
-| Package Management | uv (Python), pnpm (Node.js) |
-| Deployment | Docker, GitHub Actions, Google Artifact Registry, Portainer |
-
-## Architecture
-
-```text
-+--------------------+
-| Frontend (Next.js) |
-+---------+----------+
-          |
-          v
-+--------------------+
-| FastAPI API Layer  |
-+---------+----------+
-          |
-          v
-+-----------------------------+
-| Model Artifact (AutoGluon)  |
-+---------+-------------------+
-          |
-          v
-+--------------------+
-| SHAP Contributions |
-+---------+----------+
-          |
-          v
-+------------------------------+
-| OpenAI Interpretation Layer  |
-+------------------------------+
-```
-
-## Evaluation and Reporting
-
-The training/evaluation pipeline includes report generation for both technical and business-facing analysis:
-
-- `ag_metrics.py`-style metric logic is implemented in `backend/src/train/stages/evaluate_model.py`.
-- `backend/src/train/stages/evaluate_model.py` computes regression quality metrics.
-- Metrics include **R²**, **MAPE**, and **SMAPE**.
-- The evaluation stage uses an LLM step to generate plain-language interpretation of metric outcomes.
-- `backend/src/train/stages/run_eda.py` produces exploratory data insights.
-- Outputs are generated as Markdown files:
-  - `backend/reports/eda_report.md`
-  - `backend/reports/evaluation_report.md`
-
-## Project Structure
-
-```text
-insurance-pricing/
-├── backend/
-│   ├── src/insurance_pricing/
-│   │   ├── main.py              # FastAPI app, endpoints, lifespan, CORS
-│   │   ├── config.py            # App settings + path resolution
-│   │   ├── schemas.py           # Pydantic request/response models
-│   │   ├── model.py             # Model/transformer loading + prediction
-│   │   ├── explainability.py    # SHAP computation
-│   │   └── interpretation.py    # OpenAI + fallback interpretation
-│   ├── models/
-│   ├── data/
-│   ├── reports/
-│   ├── Dockerfile
-│   └── pyproject.toml
-├── frontend/
-│   ├── Dockerfile
-│   └── docker-entrypoint.sh
-├── insurance-pricing-portainer-stack.txt
-└── README.md
-```
+| AI/ML | AutoGluon, SHAP, OpenAI |
+| Data | pandas, NumPy, scikit-learn, Pydantic |
+| Package Management | uv (backend), pnpm (frontend) |
+| Deployment | Docker, GitHub Actions, Google Artifact Registry |
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.13+
-- Node.js 24+
-- [uv](https://github.com/astral-sh/uv)
-- [pnpm](https://pnpm.io/)
-- OpenAI API key
+- Python 3.13+ / [uv](https://docs.astral.sh/uv/)
+- Node.js 24+ / [pnpm](https://pnpm.io/)
 
-### Installation
+### Installation & Running
 
 ```bash
-# Clone and enter project root
-git clone https://github.com/Symfa-Inc/insurance-pricing.git
-cd insurance-pricing
-
-# Install Python dependencies (workspace)
+# Backend
+cd backend
+cp .env.example .env          # Add your OpenAI API key
 uv sync
+uv run uvicorn insurance_pricing.main:app --reload
 
-# Install frontend dependencies
+# Frontend
 cd frontend
 pnpm install
-cd ..
-```
-
-### Configuration
-
-Set required environment variables before running:
-
-```bash
-export OPENAI_API_KEY="your_openai_api_key"
-```
-
-Optional model artifact overrides:
-
-```bash
-export MODEL_PATH="backend/models/ag_insurance"
-export TRANSFORMER_PATH="backend/models/feature_transformer.joblib"
-```
-
-Optional frontend API override for local development:
-
-```bash
-export NEXT_PUBLIC_API_BASE_URL="http://localhost:8000"
-```
-
-### Running Locally
-
-Backend:
-
-```bash
-cd backend
-uv run uvicorn insurance_pricing.main:app --reload
-```
-
-Frontend:
-
-```bash
-cd frontend
 pnpm dev
 ```
 
-Local URLs:
-
-- API docs: http://localhost:8000/docs
-- Frontend app: http://localhost:3000
-
-## Running with Docker
-
-Backend:
-
-```bash
-cd backend
-docker build -t insurance-pricing-backend .
-docker run -p 8000:8000 -e OPENAI_API_KEY="$OPENAI_API_KEY" insurance-pricing-backend
-```
-
-Frontend:
-
-```bash
-cd frontend
-docker build -t insurance-pricing-frontend .
-docker run -p 3000:3000 -e API_URL=http://localhost:8000 insurance-pricing-frontend
-```
-
-For deployed environments, set `API_URL` to `https://api-insurance-pricing.symfa.ai`.
+Open [http://localhost:3000](http://localhost:3000) (frontend) and [http://localhost:8000/docs](http://localhost:8000/docs) (API docs).
 
 ## License
 
-This project is licensed under the Apache License 2.0.
-See `LICENSE` for details.
+[MIT](LICENSE)
