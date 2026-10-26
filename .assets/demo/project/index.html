@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-composition-variables='[
+  {"id":"color-ground","type":"color","label":"Background","default":"#fafafa"},
+  {"id":"color-ink","type":"color","label":"Text","default":"#18181b"},
+  {"id":"color-accent","type":"color","label":"Accent","default":"#009767"}
+]'>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Insurance Pricing product demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #fafafa; }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+      #ground { position: absolute; inset: 0; background: #fafafa; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="61" data-width="1920" data-height="1080">
+      <div id="ground"></div>
+      <!-- the product, one continuous take under the chapter cards -->
+      <div id="app" data-composition-id="app" data-composition-src="compositions/app.html" data-start="5.3" data-duration="49.3" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:1"></div>
+      <!-- hook poster + first chapter line (kinetic card 3.45-5.85); the sheet whips out to the left -->
+      <div id="intro" data-composition-id="intro" data-composition-src="compositions/intro.html" data-start="0" data-duration="5.9" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:5"></div>
+      <!-- chapter cards: kinetic headline cards, 2.4 s each, whip in/out on beats -->
+      <div id="card-why" data-composition-id="card-why" data-composition-src="compositions/card-why.html" data-start="21" data-duration="2.4" data-track-index="3" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:5"></div>
+      <div id="card-whatif" data-composition-id="card-whatif" data-composition-src="compositions/card-whatif.html" data-start="36.6" data-duration="2.4" data-track-index="3" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:5"></div>
+      <!-- end card, held while the music fades to silence -->
+      <div id="outro" data-composition-id="outro" data-composition-src="compositions/outro.html" data-start="54" data-duration="7" data-track-index="4" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index:6"></div>
+
+      <!-- bed fades over the bar 57.6-60.4 s (4-bar phrase line at 57.6) under the held end card; 0.6 s of true silence closes the film -->
+      <audio id="music" class="clip" src="assets/music/bed.wav" data-start="0" data-duration="60.4" data-fade-out="2.8" data-track-index="10" data-volume="1"></audio>
+      <audio id="sfx-click-1" class="clip" src="assets/sfx/click-soft.mp3" data-start="6.610" data-duration="0.36" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-click-2" class="clip" src="assets/sfx/click-soft.mp3" data-start="8.010" data-duration="0.36" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-click-3" class="clip" src="assets/sfx/click-soft.mp3" data-start="9.510" data-duration="0.36" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-click-4" class="clip" src="assets/sfx/click-soft.mp3" data-start="11.610" data-duration="0.36" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-click-5" class="clip" src="assets/sfx/click-soft.mp3" data-start="12.560" data-duration="0.36" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-click-6" class="clip" src="assets/sfx/click-soft.mp3" data-start="13.710" data-duration="0.36" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-click-7" class="clip" src="assets/sfx/click-soft.mp3" data-start="39.810" data-duration="0.36" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-click-8" class="clip" src="assets/sfx/click-soft.mp3" data-start="40.760" data-duration="0.36" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-click-9" class="clip" src="assets/sfx/click-soft.mp3" data-start="42.210" data-duration="0.36" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-key-1" class="clip" src="assets/sfx/key-press.mp3" data-start="7.007" data-duration="0.2" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="sfx-key-2" class="clip" src="assets/sfx/key-press.mp3" data-start="7.127" data-duration="0.2" data-track-index="14" data-volume="0.3"></audio>
+      <audio id="sfx-key-3" class="clip" src="assets/sfx/key-press.mp3" data-start="8.357" data-duration="0.2" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="sfx-key-4" class="clip" src="assets/sfx/key-press.mp3" data-start="8.467" data-duration="0.2" data-track-index="14" data-volume="0.3"></audio>
+      <audio id="sfx-key-5" class="clip" src="assets/sfx/key-press.mp3" data-start="8.577" data-duration="0.2" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="sfx-key-6" class="clip" src="assets/sfx/key-press.mp3" data-start="8.687" data-duration="0.2" data-track-index="14" data-volume="0.3"></audio>
+      <audio id="sfx-key-7" class="clip" src="assets/sfx/key-press.mp3" data-start="9.857" data-duration="0.2" data-track-index="12" data-volume="0.3"></audio>
+      <audio id="sfx-wipe-1" class="clip" src="assets/sfx/whoosh.mp3" data-start="5.430" data-duration="0.57" data-track-index="13" data-volume="0.16"></audio>
+      <audio id="sfx-wipe-2" class="clip" src="assets/sfx/whoosh-b.mp3" data-start="21.030" data-duration="0.7" data-track-index="13" data-volume="0.16"></audio>
+      <audio id="sfx-wipe-3" class="clip" src="assets/sfx/whoosh.mp3" data-start="22.980" data-duration="0.57" data-track-index="13" data-volume="0.16"></audio>
+      <audio id="sfx-wipe-4" class="clip" src="assets/sfx/whoosh-b.mp3" data-start="36.630" data-duration="0.7" data-track-index="13" data-volume="0.16"></audio>
+      <audio id="sfx-wipe-5" class="clip" src="assets/sfx/whoosh.mp3" data-start="38.580" data-duration="0.57" data-track-index="13" data-volume="0.16"></audio>
+      <audio id="sfx-wipe-6" class="clip" src="assets/sfx/whoosh-b.mp3" data-start="54.030" data-duration="0.7" data-track-index="13" data-volume="0.16"></audio>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+/* film-only styles for the rebuilt app scene; everything app-looking comes from the app's own Tailwind CSS */
+@font-face { font-family: "Geist"; font-style: normal; font-weight: 100 900; src: url("assets/fonts/Geist-latin.woff2") format("woff2"); }
+@font-face { font-family: "Geist Mono"; font-style: normal; font-weight: 100 900; src: url("assets/fonts/GeistMono-latin.woff2") format("woff2"); }
+
+#root { position: absolute; inset: 0; overflow: hidden; background: #fafafa; }
+/* camera: no will-change, GSAP keeps it 2D (force3D:false) so Chrome repaints DOM/SVG at the final zoom */
+#ap-cam { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+#ap-page {
+  position: absolute; left: 0; top: 0; width: 1905px; height: 1080px; overflow: visible; /* 1920 minus the 15 px scrollbar gutter the live page reserves (html { scrollbar-gutter: stable }) */
+  --font-geist-sans: "Geist", system-ui, sans-serif;
+  --font-geist-mono: "Geist Mono", ui-monospace, monospace;
+  font-family: "Geist", system-ui, sans-serif; background: #fafafa; color: #18181b;
+  -webkit-font-smoothing: antialiased;
+}
+/* the timeline owns every change: no browser-clock transitions or keyframe animations */
+#ap-page *, #ap-page *::before, #ap-page *::after { animation: none !important; transition: none !important; }
+
+/* native <select class="field"> drawn as a div with the app's own chevron rule */
+.ap-select {
+  appearance: none; position: relative;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right .625rem center; background-repeat: no-repeat; background-size: 1rem; padding-right: 2rem;
+}
+.ap-v1 { position: absolute; left: 12px; top: 8px; opacity: 0; }
+.ap-txt { white-space: pre; }
+.ap-old { border-radius: 2px; }
+.ap-caret { display: inline-block; width: 1px; height: 17px; background: #18181b; vertical-align: -3px; margin-left: 1px; opacity: 0; }
+
+/* dropdown menu (the OS popup of a native select, drawn in the app's zinc styling) */
+.ap-menu {
+  position: absolute; z-index: 30; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 8px; padding: 4px;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,.10), 0 4px 6px -4px rgba(0,0,0,.10);
+  transform-origin: 50% 0; opacity: 0; font-family: "Geist", system-ui, sans-serif; font-size: 14px; line-height: 20px; color: #18181b; -webkit-font-smoothing: antialiased;
+}
+.ap-menu-hl { position: absolute; left: 4px; right: 4px; top: 4px; height: 32px; border-radius: 6px; background: #f4f4f5; opacity: 0; }
+.ap-item { position: relative; height: 32px; padding: 6px 8px; display: flex; align-items: center; justify-content: space-between; }
+.ap-item svg { width: 14px; height: 14px; color: #18181b; }
+
+/* result column states are stacked: idle and pending cards sit over the (hidden) result cards */
+#ap-rcol { position: relative; }
+#ap-idle, #ap-pending { position: absolute; left: 0; right: 0; top: 0; height: 542px; }
+#ap-pending { opacity: 0; }
+#ap-ilist { position: relative; }
+#ap-ul-no { position: absolute; left: 0; right: 0; top: 0; margin-top: 0; } /* same origin as the first list (its mt-3 already collapsed into #ap-ilist) */
+#ap-ul-no li { opacity: 0; }
+.ap-mark { position: absolute; left: -8px; right: -10px; top: -3px; bottom: -3px; border-radius: 6px; background: #d0fae5; transform-origin: 0 50%; opacity: 0; }
+.ap-li { position: relative; }
+/* text and dot sit above the highlight mark. :not(.ap-mark) matters: a plain ".ap-li > span" (0,1,1) beat
+   ".ap-mark" (0,1,0), turned the mark into an in-flow flex item and the li's gap-2.5 pushed the first bullet 10 px right */
+.ap-li > span:not(.ap-mark) { position: relative; }
+
+/* cursor (app space; it scales with the camera like a screen recording) */
+#ap-cursor { position: absolute; left: 0; top: 0; width: 26px; height: 26px; z-index: 40; transform-origin: 5px 3px; }
+#ap-cursor svg { display: block; filter: drop-shadow(0 1px 1.2px rgba(0,0,0,.3)); }
+
+/* callouts: screen space, 30 px on screen, anchored to the element they name */
+#ap-calls { position: absolute; inset: 0; pointer-events: none; }
+.ap-call { position: absolute; inset: 0; opacity: 0; }
+.ap-call svg { position: absolute; left: 0; top: 0; overflow: visible; }
+.ap-call-box {
+  position: absolute; white-space: nowrap; font-family: "Geist", sans-serif; font-weight: 600; font-size: 30px; line-height: 36px;
+  letter-spacing: -0.01em; color: #18181b; background: #ffffff; border: 1px solid #e4e4e7; border-left: 4px solid #00d294;
+  border-radius: 12px; padding: 14px 24px 14px 22px; box-shadow: 0 12px 32px rgba(24,24,27,.12);
+}

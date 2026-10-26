@@ -71,3 +71,6 @@ out/
 # OS
 .DS_Store
 Thumbs.db
+
+# HyperFrames local state
+.hyperframes/
