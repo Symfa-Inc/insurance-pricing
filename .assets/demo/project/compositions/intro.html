@@ -8,10 +8,10 @@
     #in-sheet::after { content: ""; position: absolute; top: 0; left: 1920px; width: 14px; height: 1080px; border-radius: 0 7px 7px 0; background: #00d294; }
 
     /* poster: lockup, headline, real estimate card */
-    #in-lock { position: absolute; left: 152px; top: 150px; display: flex; align-items: center; gap: 20px; }
-    #in-mark { width: 57px; height: 72px; display: block; }
-    #in-name { font-size: 44px; font-weight: 600; letter-spacing: -0.025em; line-height: 1; margin: 0; }
-    #in-head { position: absolute; left: 148px; top: 318px; margin: 0; font-size: 104px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; white-space: nowrap; }
+    #in-lock { position: absolute; left: 160px; top: 120px; display: flex; align-items: center; gap: 20px; }
+    #in-mark { width: 71px; height: 90px; display: block; }
+    #in-name { font-size: 48px; font-weight: 600; letter-spacing: -0.025em; line-height: 1; margin: 0; }
+    #in-head { position: absolute; left: 152px; top: 282px; margin: 0; font-size: 104px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; white-space: nowrap; }
     #in-head .w, #in-line .w { display: inline-block; }
     #in-why { color: #009767; }
     /* accent:start - ONE underline rule for every underlined accent word (poster "why.", every chapter card).
@@ -26,9 +26,9 @@
   background: #00d294; transform-origin: 0 50%;
 }
 /* accent:end */
-    #in-sub { position: absolute; left: 152px; top: 590px; width: 780px; margin: 0; font-size: 34px; line-height: 1.35; font-weight: 400; color: #71717b; letter-spacing: -0.01em; }
+    #in-sub { position: absolute; left: 159px; top: 554px; width: 780px; margin: 0; font-size: 34px; line-height: 1.35; font-weight: 400; color: #71717b; letter-spacing: -0.01em; }
 
-    #in-card { position: absolute; left: 1060px; top: 150px; width: 708px; padding: 48px 52px 52px; background: #ffffff; border: 1px solid #f4f4f5; border-radius: 24px; box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px -1px rgba(0,0,0,.1); }
+    #in-card { position: absolute; left: 1095px; top: 150px; width: 708px; padding: 48px 52px 52px; background: #ffffff; border: 1px solid #f4f4f5; border-radius: 24px; box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px -1px rgba(0,0,0,.1); }
     #in-card-top { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #00d294, transparent); }
     .in-label { margin: 0; font-size: 28px; line-height: 1; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: #71717b; }
     #in-price { margin: 18px 0 0; font-family: "Geist Mono", monospace; font-size: 92px; line-height: 1.05; font-weight: 600; letter-spacing: -0.025em; }
@@ -38,7 +38,7 @@
     .in-row-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 30px; line-height: 34px; }
     .in-f { font-weight: 500; color: #3f3f46; }
     .in-f span { font-weight: 400; color: #71717b; }
-    .in-v { font-family: "Geist Mono", monospace; font-size: 28px; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .in-v { font-family: "Geist Mono", monospace; font-size: 28px; font-weight: 500; font-variant-numeric: tabular-nums; opacity: 0; }
     .in-v.pos { color: #009767; } .in-v.neg { color: #e11d48; }
     .in-track { position: relative; height: 10px; margin-top: 8px; border-radius: 5px; background: #f4f4f5; }
     .in-mid { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: #d4d4d8; }
@@ -48,7 +48,7 @@
 
     /* chapter line: kinetic card, centred on both axes (ghost type sweeps to ink word by word, accent rule draws) */
     #in-stack { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-    #in-line { margin: 0; font-size: 112px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; white-space: nowrap; text-align: center; }
+    #in-line { position: relative; left: -4px; margin: 0; font-size: 112px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; white-space: nowrap; text-align: center; }
     #in-line .w { position: relative; opacity: 0; color: #e4e4e7; }
   </style>
   <div id="root" data-composition-id="intro" data-width="1920" data-height="1080">
@@ -102,6 +102,10 @@
           }
         })(i);
       }
+      // values start hidden (frame 0 never reads "+0") and fade in once with their bar's growth
+      tl.set(".in-v", { opacity: 0 }, 0);
+      var iv = document.querySelectorAll(".in-v");
+      for (var q = 0; q < iv.length; q++) ft(iv[q], { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power1.out" }, 0.15 + 0.08 * q);
       tl.set("#in-b0", { width: "2%" }, 0);
       for (var j = 1; j < 6; j++) tl.set("#in-b" + j, { width: "2%" }, 0);
       ft("#in-ul", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.inOut" }, 1.5);

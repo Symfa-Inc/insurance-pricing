@@ -7,8 +7,8 @@
     #cw-sheet::before, #cw-sheet::after { content: ""; position: absolute; top: 0; width: 14px; height: 1080px; background: #00d294; }
     #cw-sheet::before { left: -14px; border-radius: 7px 0 0 7px; }
     #cw-sheet::after { left: 1920px; border-radius: 0 7px 7px 0; }
-    #cw-stack { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    #cw-line { margin: 0; font-size: 112px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; color: #e4e4e7; white-space: nowrap; text-align: center; }
+    #cw-stack { position: absolute; inset: 0; transform: translateY(0px); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    #cw-line { position: relative; left: -2.5px; margin: 0; font-size: 112px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; color: #e4e4e7; white-space: nowrap; text-align: center; }
     .cw-w { display: inline-block; position: relative; color: #e4e4e7; }
     /* accent:start - ONE underline rule for every underlined accent word (poster "why.", every chapter card).
    It is placed from the font's own metrics, never from the bottom of the line box:
@@ -24,7 +24,7 @@
 /* accent:end */
     .cw-sk { position: relative; }
     .cw-st { position: absolute; left: -6px; right: -6px; top: 54%; height: 10px; margin-top: -5px; border-radius: 5px; background: #00d294; transform-origin: 0 50%; }
-    #cw-sub { margin: 40px 0 0; font-family: "Geist Mono", monospace; font-size: 64px; line-height: 1; font-weight: 600; letter-spacing: -0.025em; color: #71717b; opacity: 0; }
+    #cw-sub { position: relative; left: 0px; margin: 40px 0 0; font-family: "Geist Mono", monospace; font-size: 64px; line-height: 1; font-weight: 600; letter-spacing: -0.025em; color: #71717b; opacity: 0; }
   </style>
   <div id="root" data-composition-id="card-whatif" data-width="1920" data-height="1080">
     <div id="cw-sheet">

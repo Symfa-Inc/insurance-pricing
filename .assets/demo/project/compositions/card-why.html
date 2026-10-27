@@ -7,8 +7,8 @@
     #cy-sheet::before, #cy-sheet::after { content: ""; position: absolute; top: 0; width: 14px; height: 1080px; background: #00d294; }
     #cy-sheet::before { left: -14px; border-radius: 7px 0 0 7px; }
     #cy-sheet::after { left: 1920px; border-radius: 0 7px 7px 0; }
-    #cy-stack { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    #cy-line { margin: 0; font-size: 112px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; color: #e4e4e7; white-space: nowrap; text-align: center; }
+    #cy-stack { position: absolute; inset: 0; transform: translateY(-3.5px); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    #cy-line { position: relative; left: -2px; margin: 0; font-size: 112px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; color: #e4e4e7; white-space: nowrap; text-align: center; }
     .cy-w { display: inline-block; position: relative; color: #e4e4e7; }
     /* accent:start - ONE underline rule for every underlined accent word (poster "why.", every chapter card).
    It is placed from the font's own metrics, never from the bottom of the line box:
@@ -24,7 +24,7 @@
 /* accent:end */
     .cy-sk { position: relative; }
     .cy-st { position: absolute; left: -6px; right: -6px; top: 54%; height: 10px; margin-top: -5px; border-radius: 5px; background: #00d294; transform-origin: 0 50%; }
-    #cy-sub { margin: 40px 0 0; font-family: "Geist Mono", monospace; font-size: 64px; line-height: 1; font-weight: 600; letter-spacing: -0.025em; color: #71717b; opacity: 0; }
+    #cy-sub { position: relative; left: -1px; margin: 40px 0 0; font-family: "Geist Mono", monospace; font-size: 64px; line-height: 1; font-weight: 600; letter-spacing: -0.025em; color: #71717b; opacity: 0; }
   </style>
   <div id="root" data-composition-id="card-why" data-width="1920" data-height="1080">
     <div id="cy-sheet">

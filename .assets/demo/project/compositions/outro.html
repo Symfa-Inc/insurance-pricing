@@ -4,13 +4,12 @@
     #root { position: absolute; inset: 0; overflow: hidden; font-family: "Geist", sans-serif; -webkit-font-smoothing: antialiased; }
     #ou-sheet { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: #fafafa; }
     #ou-sheet::before { content: ""; position: absolute; top: 0; left: -14px; width: 14px; height: 1080px; border-radius: 7px 0 0 7px; background: #00d294; }
-    #ou-lock { position: absolute; left: 0; right: 0; top: 318px; display: flex; align-items: center; justify-content: center; gap: 44px; }
+    #ou-lock { position: absolute; left: 4px; right: 0; top: 324.5px; display: flex; align-items: center; justify-content: center; gap: 50px; }
     #ou-mark { width: 173px; height: 220px; display: block; }
-    #ou-word { margin: 0; font-size: 124px; font-weight: 600; letter-spacing: -0.045em; color: #18181b; line-height: 1; white-space: nowrap; }
+    #ou-word { margin: 0; font-size: 150px; font-weight: 600; letter-spacing: -0.04em; color: #18181b; line-height: 1; white-space: nowrap; }
     .ou-l { display: inline-block; opacity: 0; }
-    #ou-tag { position: absolute; left: 0; right: 0; top: 640px; margin: 0; text-align: center; font-size: 48px; font-weight: 500; letter-spacing: -0.02em; color: #52525c; opacity: 0; }
-    #ou-tag b { font-weight: 600; color: #009767; }
-    #ou-url { position: absolute; left: 0; right: 0; top: 728px; margin: 0; text-align: center; font-size: 36px; font-weight: 500; color: #007956; opacity: 0; letter-spacing: -0.005em; }
+    #ou-tag { position: absolute; left: -1.5px; right: 1.5px; top: 633.5px; margin: 0; text-align: center; font-size: 46px; line-height: 1; font-weight: 500; letter-spacing: -0.015em; color: #52525c; opacity: 0; }
+    #ou-url { position: absolute; left: 0; right: 0; top: 718.5px; margin: 0; text-align: center; font-size: 36px; line-height: 1; font-weight: 500; color: #007956; opacity: 0; letter-spacing: -0.005em; }
   </style>
   <div id="root" data-composition-id="outro" data-width="1920" data-height="1080">
     <div id="ou-sheet">
@@ -18,7 +17,7 @@
         <img id="ou-mark" src="assets/brand/mark.png" alt="Insurance Pricing" />
         <p id="ou-word" data-layout-allow-overlap><span class="ou-l">I</span><span class="ou-l">n</span><span class="ou-l">s</span><span class="ou-l">u</span><span class="ou-l">r</span><span class="ou-l">a</span><span class="ou-l">n</span><span class="ou-l">c</span><span class="ou-l">e</span><span class="ou-l">&nbsp;</span><span class="ou-l">P</span><span class="ou-l">r</span><span class="ou-l">i</span><span class="ou-l">c</span><span class="ou-l">i</span><span class="ou-l">n</span><span class="ou-l">g</span></p>
       </div>
-      <p id="ou-tag">Know the price. <b>Know why.</b></p>
+      <p id="ou-tag">Know the price. Know why.</p>
       <p id="ou-url">insurance-pricing.symfa.ai</p>
     </div>
   </div>
@@ -33,12 +32,12 @@
       ft("#ou-sheet", { filter: "blur(10px)" }, { filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 0.25);
       tl.set("#ou-mark", { clipPath: "inset(100% 0% 0% 0%)" }, 0);
       // the mark is drawn upward, like a shield being raised; then the name, letter by letter
-      ft("#ou-mark", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.75, ease: "power2.inOut" }, 0.6);
+      ft("#ou-mark", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.75, ease: "power2.inOut" }, 0.55);
       var l = document.querySelectorAll("#ou-word .ou-l");
-      for (var i = 0; i < l.length; i++) ft(l[i], { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 1.0 + i * 0.035);
-      ft("#ou-tag", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power2.out" }, 1.85);
-      ft("#ou-url", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power2.out" }, 2.25);
-      tl.to({}, { duration: 0.01 }, 6.98);
+      for (var i = 0; i < l.length; i++) ft(l[i], { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 0.95 + i * 0.05);
+      ft("#ou-tag", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power2.out" }, 1.75);
+      ft("#ou-url", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power2.out" }, 2.15);
+      tl.to({}, { duration: 0.01 }, 7.48);
       window.__timelines["outro"] = tl;
     })();
   </script>

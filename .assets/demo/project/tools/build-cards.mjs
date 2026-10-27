@@ -11,8 +11,10 @@ import fs from "node:fs";
 import path from "node:path";
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const CARDS = [
-  { id: "card-why", p: "cy", words: ["Why", "this", "price?"], acc: 2, extra: "price" },
-  { id: "card-whatif", p: "cw", words: ["What", "if", "she", "quits", "smoking?"], acc: 3, strike: 4 },
+// fix: measured glyph-ink corrections (px) so each card's ink box (cap top to baseline) centres on (959.5, 539.5)
+// within 1 px: flex centring alone leaves the trailing -0.04em tracking on the right, and the "Why" block sat low.
+  { id: "card-why", p: "cy", words: ["Why", "this", "price?"], acc: 2, extra: "price", fix: { line: -2, sub: -1, y: -3.5 } },
+  { id: "card-whatif", p: "cw", words: ["What", "if", "she", "quits", "smoking?"], acc: 3, strike: 4, fix: { line: -2.5, sub: 0, y: 0 } },
 ];
 const DUR = 2.4, OUT = 1.95;
 for (const c of CARDS) {
@@ -34,13 +36,13 @@ for (const c of CARDS) {
     #${p}-sheet::before, #${p}-sheet::after { content: ""; position: absolute; top: 0; width: 14px; height: 1080px; background: #00d294; }
     #${p}-sheet::before { left: -14px; border-radius: 7px 0 0 7px; }
     #${p}-sheet::after { left: 1920px; border-radius: 0 7px 7px 0; }
-    #${p}-stack { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    #${p}-line { margin: 0; font-size: 112px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; color: #e4e4e7; white-space: nowrap; text-align: center; }
+    #${p}-stack { position: absolute; inset: 0; transform: translateY(${c.fix.y}px); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    #${p}-line { position: relative; left: ${c.fix.line}px; margin: 0; font-size: 112px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; color: #e4e4e7; white-space: nowrap; text-align: center; }
     .${p}-w { display: inline-block; position: relative; color: #e4e4e7; }
     /* accent:start */ /* accent:end */
     .${p}-sk { position: relative; }
     .${p}-st { position: absolute; left: -6px; right: -6px; top: 54%; height: 10px; margin-top: -5px; border-radius: 5px; background: #00d294; transform-origin: 0 50%; }
-    #${p}-sub { margin: 40px 0 0; font-family: "Geist Mono", monospace; font-size: 64px; line-height: 1; font-weight: 600; letter-spacing: -0.025em; color: #71717b; opacity: 0; }
+    #${p}-sub { position: relative; left: ${c.fix.sub}px; margin: 40px 0 0; font-family: "Geist Mono", monospace; font-size: 64px; line-height: 1; font-weight: 600; letter-spacing: -0.025em; color: #71717b; opacity: 0; }
   </style>
   <div id="root" data-composition-id="${c.id}" data-width="1920" data-height="1080">
     <div id="${p}-sheet">
@@ -86,6 +88,7 @@ for (const c of CARDS) {
   </script>
 </template>
 `;
-  fs.writeFileSync(path.join(ROOT, `compositions/${c.id}.html`), html);
+  // no trailing whitespace from the empty template slots (pre-commit trims it otherwise)
+  fs.writeFileSync(path.join(ROOT, `compositions/${c.id}.html`), html.replace(/[ \t]+$/gm, ""));
   console.log("wrote", c.id);
 }
