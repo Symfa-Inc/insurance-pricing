@@ -50,7 +50,7 @@
 .ap-li > span:not(.ap-mark) { position: relative; }
 
 /* cursor (app space; it scales with the camera like a screen recording) */
-#ap-cursor { position: absolute; left: 0; top: 0; width: 26px; height: 26px; z-index: 40; transform-origin: 5px 3px; }
+#ap-cursor { position: absolute; left: 0; top: 0; width: 24px; height: 24px; z-index: 40; transform-origin: 4.6px 2.8px; }
 #ap-cursor svg { display: block; filter: drop-shadow(0 1px 1.2px rgba(0,0,0,.3)); }
 
 /* callouts: screen space, 30 px on screen, anchored to the element they name */

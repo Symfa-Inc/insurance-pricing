@@ -105,7 +105,7 @@ const menu = (k, items, cur) => {
 };
 const MENUS = menu("region", ["Northeast", "Northwest", "Southeast", "Southwest"], 0) + menu("smoker", ["No", "Yes"], 1);
 
-const CURSOR = `<div id="ap-cursor"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M5 2.6 L5 20.8 L9.6 16.7 L12.7 23.5 L15.6 22.2 L12.6 15.6 L18.8 15.4 Z" fill="#111111" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/></svg></div>`;
+const CURSOR = `<div id="ap-cursor"><svg width="24" height="24" viewBox="0 0 26 26"><path d="M5 2.6 L5 20.8 L9.6 16.7 L12.7 23.5 L15.6 22.2 L12.6 15.6 L18.8 15.4 Z" fill="#111111" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/></svg></div>`;
 
 // ---------- callouts (screen space): anchor in app px, seen at a fixed camera framing ----------
 const F = SHOTS.framings;
@@ -122,6 +122,9 @@ function anchorOf(name) {
     case "region-bar-neg": return [r[4].trackX + r[4].trackW * (0.5 - WY[4].w / 100), r[4].trackY + 4];
     case "smoker-bar-neg": return [r[0].trackX + r[0].trackW * (0.5 - WN[0].w / 100), r[0].trackY + 4 + (G.ilistNo.h - G.ilistYes.h)];
     case "smoker-value": return [r[0].row.x + r[0].row.w - 18, r[0].row.y - 2];
+    // just right of the smoker value ("-9056"), on its centre line, like "price-end": the leader leaves upward from
+    // outside the number and never crosses it
+    case "smoker-value-end": return [r[0].row.x + r[0].row.w + 9, r[0].row.y + 10];
     case "badge": return [G.badge.x + G.badge.w, G.badge.y + G.badge.h / 2];
     case "bullet-0": return [G.li0.amt.x + G.li0.amt.w / 2, G.li0.amt.y - 5]; // just above "$8,602" (v1 sat on its full stop)
     default: throw new Error("unknown anchor " + name);

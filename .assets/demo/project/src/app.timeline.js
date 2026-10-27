@@ -38,7 +38,8 @@
   function cam(g, name, d) { var v = camAt(F[name]); v.duration = d || 1.0; v.ease = "power2.inOut"; to("#ap-cam", v, g); }
 
   // ---------------- cursor ----------------
-  var HX = 5, HY = 2.6, cur = { x: 0, y: 0 };
+  // cursor: 24x24 CSS px box (the 26-unit path drawn at 24/26), tip at (5, 2.6) * 24/26
+  var HX = 4.615, HY = 2.4, cur = { x: 0, y: 0 };
   function curSet(g, x, y) { cur = { x: x, y: y }; set("#ap-cursor", { x: x - HX, y: y - HY }, g); }
   function curMove(g, x, y, d, ease) {
     d = d || 0.6; ease = ease || "power3.inOut";
@@ -118,12 +119,21 @@
   }
 
   // ---------------- callouts ----------------
+  // One fade per callout: only the parent's opacity rises (0 -> 1, 0.2 s), so the box can never show, drop and re-fade.
+  // The box only sharpens (blur 6 -> 0) and the leader draws, both from the same frame g; every animated child sits in
+  // its hidden start state from the app's first frame (calloutInit), never from a late fromTo.
+  function calloutLen(c) { return parseFloat($(c.id + "-ln").getAttribute("stroke-dasharray")); }
+  function calloutInit(c) {
+    var id = "#" + c.id;
+    set(id, { opacity: 0 }, A0);
+    set(id + "-ln", { attr: { "stroke-dashoffset": calloutLen(c) } }, A0);
+    set(id + "-box", { opacity: 1, filter: "blur(6px)" }, A0);
+  }
   function callout(c) {
-    var g = c.t, h = c.hold, id = "#" + c.id;
-    var len = parseFloat($(c.id + "-ln").getAttribute("stroke-dasharray"));
-    ft(id, { opacity: 0 }, { opacity: 1, duration: 0.18, ease: "power2.out" }, g);
+    var g = c.t, h = c.hold, id = "#" + c.id, len = calloutLen(c);
+    ft(id, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, g);
     ft(id + "-ln", { attr: { "stroke-dashoffset": len } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.28, ease: "power2.out" }, g);
-    ft(id + "-box", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.22, ease: "power2.out" }, g + 0.14);
+    ft(id + "-box", { filter: "blur(6px)" }, { filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, g);
     to(id, { opacity: 0, duration: 0.2, ease: "power2.in" }, g + h);
   }
   // ---------------- focus: the panels the shot is not about fade to the ground, so a push-in never shows a
@@ -150,7 +160,7 @@
   set(["#ap-card-price", "#ap-card-interp", "#ap-card-shap"], { opacity: 0, y: 8 }, A0);
   for (var r = 0; r < 6; r++) set(["#ap-bp-" + r, "#ap-bn-" + r], { width: "0%" }, A0);
   set("#ap-ilist", { height: G.ilistYes.h }, A0);
-  set(".ap-call", { opacity: 0 }, A0);
+  SH.callouts.forEach(calloutInit);
   set("#ap-menu-region-hl", { opacity: 0, y: 0 }, A0);
   set("#ap-menu-smoker-hl", { opacity: 0, y: 0 }, A0);
   curSet(A0, 660, 760); // below the frame at F1
