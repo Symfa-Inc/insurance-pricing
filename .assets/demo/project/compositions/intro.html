@@ -1,0 +1,132 @@
+<template>
+  <style>
+    @font-face { font-family: "Geist"; font-style: normal; font-weight: 100 900; src: url("assets/fonts/Geist-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Geist Mono"; font-style: normal; font-weight: 100 900; src: url("assets/fonts/GeistMono-latin.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; overflow: hidden; font-family: "Geist", sans-serif; -webkit-font-smoothing: antialiased; color: #18181b; }
+    #in-sheet { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: #fafafa; }
+    /* the app's emerald header bar rides the sheet's trailing edge when it whips out (same move as the chapter cards) */
+    #in-sheet::after { content: ""; position: absolute; top: 0; left: 1920px; width: 14px; height: 1080px; border-radius: 0 7px 7px 0; background: #00d294; }
+
+    /* poster: lockup, headline, real estimate card */
+    #in-lock { position: absolute; left: 160px; top: 120px; display: flex; align-items: center; gap: 20px; }
+    #in-mark { width: 71px; height: 90px; display: block; }
+    #in-name { font-size: 48px; font-weight: 600; letter-spacing: -0.025em; line-height: 1; margin: 0; }
+    #in-head { position: absolute; left: 152px; top: 282px; margin: 0; font-size: 104px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; white-space: nowrap; }
+    #in-head .w, #in-line .w { display: inline-block; }
+    #in-why { color: #009767; }
+    /* accent:start - ONE underline rule for every underlined accent word (poster "why.", every chapter card).
+   It is placed from the font's own metrics, never from the bottom of the line box:
+   Geist ascent 1.005em + descent 0.295em = 1.3em content area, so the baseline sits (line-height - 1.3)/2 + 1.005 em
+   below the top of the inline-block; the deepest descender ("g") reaches 0.162em below the baseline.
+   The bar starts 6 px below that descender and is 10 px thick, so it never touches y, p, q or g at any size. */
+.acc-u { position: relative; display: inline-block; line-height: var(--acc-lh, 1.04); }
+.acc-u > .acc-bar {
+  position: absolute; left: 4px; right: 4px; height: 10px; border-radius: 5px;
+  top: calc(((var(--acc-lh, 1.04) - 1.3) / 2 + 1.005 + 0.162) * 1em + 6px);
+  background: #00d294; transform-origin: 0 50%;
+}
+/* accent:end */
+    #in-sub { position: absolute; left: 159px; top: 554px; width: 780px; margin: 0; font-size: 34px; line-height: 1.35; font-weight: 400; color: #71717b; letter-spacing: -0.01em; }
+
+    #in-card { position: absolute; left: 1095px; top: 150px; width: 708px; padding: 48px 52px 52px; background: #ffffff; border: 1px solid #f4f4f5; border-radius: 24px; box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px -1px rgba(0,0,0,.1); }
+    #in-card-top { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #00d294, transparent); }
+    .in-label { margin: 0; font-size: 28px; line-height: 1; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: #71717b; }
+    #in-price { margin: 18px 0 0; font-family: "Geist Mono", monospace; font-size: 92px; line-height: 1.05; font-weight: 600; letter-spacing: -0.025em; }
+    #in-rule { height: 1px; background: #f4f4f5; margin: 36px 0 34px; }
+    #in-rows { margin-top: 26px; }
+    .in-row { height: 66px; }
+    .in-row-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 30px; line-height: 34px; }
+    .in-f { font-weight: 500; color: #3f3f46; }
+    .in-f span { font-weight: 400; color: #71717b; }
+    .in-v { font-family: "Geist Mono", monospace; font-size: 28px; font-weight: 500; font-variant-numeric: tabular-nums; opacity: 0; }
+    .in-v.pos { color: #009767; } .in-v.neg { color: #e11d48; }
+    .in-track { position: relative; height: 10px; margin-top: 8px; border-radius: 5px; background: #f4f4f5; }
+    .in-mid { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: #d4d4d8; }
+    .in-bar { position: absolute; top: 0; bottom: 0; }
+    .in-bar.pos { left: 50%; border-radius: 0 5px 5px 0; background: #00bb7f; }
+    .in-bar.neg { right: 50%; border-radius: 5px 0 0 5px; background: #ff667f; }
+
+    /* chapter line: kinetic card, centred on both axes (ghost type sweeps to ink word by word, accent rule draws) */
+    #in-stack { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    #in-line { position: relative; left: -4px; margin: 0; font-size: 112px; line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; white-space: nowrap; text-align: center; }
+    #in-line .w { position: relative; opacity: 0; color: #e4e4e7; }
+  </style>
+  <div id="root" data-composition-id="intro" data-width="1920" data-height="1080">
+    <div id="in-sheet">
+      <div id="in-poster">
+        <div id="in-lock"><img id="in-mark" src="assets/brand/mark.png" alt="" /><p id="in-name">Insurance Pricing</p></div>
+        <h1 id="in-head" data-layout-allow-overlap><span class="w">Know</span> <span class="w">the</span> <span class="w">price.</span><br /><span class="w">Know</span> <span class="w acc-u" id="in-why">why.<span class="acc-bar" id="in-ul"></span></span></h1>
+        <p id="in-sub">Annual insurance cost estimates, with the reasons behind every number.</p>
+        <div id="in-card">
+          <div id="in-card-top"></div>
+          <p class="in-label">Estimated annual charges</p>
+          <p id="in-price">$33,216.29</p>
+          <div id="in-rule"></div>
+          <p class="in-label">Feature impact</p>
+          <div id="in-rows">
+            <div class="in-row"><div class="in-row-top"><span class="in-f">smoker <span>yes</span></span><span class="in-v pos"><span id="in-s0">+</span><span id="in-v0">0</span></span></div><div class="in-track"><div class="in-mid"></div><div class="in-bar pos" id="in-b0"></div></div></div>
+            <div class="in-row"><div class="in-row-top"><span class="in-f">bmi <span>30.4</span></span><span class="in-v pos"><span id="in-s1">+</span><span id="in-v1">0</span></span></div><div class="in-track"><div class="in-mid"></div><div class="in-bar pos" id="in-b1"></div></div></div>
+            <div class="in-row"><div class="in-row-top"><span class="in-f">age <span>48</span></span><span class="in-v pos"><span id="in-s2">+</span><span id="in-v2">0</span></span></div><div class="in-track"><div class="in-mid"></div><div class="in-bar pos" id="in-b2"></div></div></div>
+            <div class="in-row"><div class="in-row-top"><span class="in-f">sex <span>female</span></span><span class="in-v pos"><span id="in-s3">+</span><span id="in-v3">0</span></span></div><div class="in-track"><div class="in-mid"></div><div class="in-bar pos" id="in-b3"></div></div></div>
+            <div class="in-row"><div class="in-row-top"><span class="in-f">region <span>northwest</span></span><span class="in-v neg"><span id="in-s4"></span><span id="in-v4">0</span></span></div><div class="in-track"><div class="in-mid"></div><div class="in-bar neg" id="in-b4"></div></div></div>
+            <div class="in-row"><div class="in-row-top"><span class="in-f">children <span>2</span></span><span class="in-v pos"><span id="in-s5">+</span><span id="in-v5">0</span></span></div><div class="in-track"><div class="in-mid"></div><div class="in-bar pos" id="in-b5"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="in-stack"><h2 id="in-line" data-layout-allow-overlap><span class="w">Start</span> <span class="w">with</span> <span class="w">one</span> <span class="w acc acc-u">applicant<span class="acc-bar" id="in-lul"></span></span></h2></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      gsap.config({ force3D: false });
+      var tl = gsap.timeline({ paused: true });
+      var FPS = 30;
+      function ft(t, a, b, g) {
+        b.immediateRender = false;
+        tl.fromTo(t, a, b, g);
+        if (b.filter === "blur(0px)") tl.set(t, { filter: "none" }, g + (b.duration || 0.5) + 0.02);
+      }
+      // the real SHAP values for the film's applicant (48, female, BMI 30.4, 2 children, smoker, northwest)
+      var V = [8601.59, 2473.24, 739.68, 246.09, -98.09, 0];
+      var W = [45, 12.94, 3.87, 2, 2, 2]; // ShapChart widths: max(2, |v| / max|v| * 45) %
+      tl.set("#in-lul", { scaleX: 0 }, 0);
+      tl.set("#in-ul", { scaleX: 0 }, 0);
+      // bars grow out of the centre line, values count with them (frame 0 already reads as a finished card)
+      for (var i = 0; i < 6; i++) {
+        ft("#in-b" + i, { width: "2%" }, { width: W[i] + "%", duration: 1.0, ease: "power3.out" }, 0.15 + 0.08 * i);
+        (function (i) {
+          var e = gsap.parseEase("power3.out"), n = 30, last = null;
+          for (var f = 0; f <= n; f++) {
+            var s = String(Math.round(V[i] * e(f / n)) || 0);
+            if (s !== last) { tl.set("#in-v" + i, { textContent: s }, 0.15 + 0.08 * i + f / FPS); last = s; }
+          }
+        })(i);
+      }
+      // values start hidden (frame 0 never reads "+0") and fade in once with their bar's growth
+      tl.set(".in-v", { opacity: 0 }, 0);
+      var iv = document.querySelectorAll(".in-v");
+      for (var q = 0; q < iv.length; q++) ft(iv[q], { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power1.out" }, 0.15 + 0.08 * q);
+      tl.set("#in-b0", { width: "2%" }, 0);
+      for (var j = 1; j < 6; j++) tl.set("#in-b" + j, { width: "2%" }, 0);
+      ft("#in-ul", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.inOut" }, 1.5);
+
+      // poster leaves on the same stage: blur-out, then the chapter line lands as a kinetic card (3.45-5.85 s = 2.4 s)
+      ft("#in-card", { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(10px)", duration: 0.28, ease: "power2.in" }, 3.45);
+      ft(["#in-sub", "#in-lock"], { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(8px)", duration: 0.24, ease: "power2.in" }, 3.51);
+      var hw = document.querySelectorAll("#in-head .w");
+      for (var k = 0; k < hw.length; k++) ft(hw[k], { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, 3.53 + 0.035 * k);
+      tl.set(["#in-card", "#in-sub", "#in-lock", "#in-head .w"], { filter: "none" }, 3.9); // invisible now; no filter left behind
+      var lw = document.querySelectorAll("#in-line .w");
+      // the ghost line appears once the poster is gone (3.87 s), then sweeps to ink word by word
+      ft(lw, { opacity: 0 }, { opacity: 1, duration: 0.16, ease: "power1.out" }, 3.86);
+      for (var m = 0; m < lw.length; m++) ft(lw[m], { color: "#e4e4e7" }, { color: m === 3 ? "#009767" : "#18181b", duration: 0.2, ease: "power1.out" }, 3.98 + 0.09 * m);
+      ft("#in-lul", { scaleX: 0 }, { scaleX: 1, duration: 0.32, ease: "power2.inOut" }, 3.98 + 0.09 * 3 + 0.16);
+
+      // exit: the sheet whips out to the left (motion blur), its trailing emerald edge uncovering the product
+      ft("#in-sheet", { x: 0 }, { x: -2050, duration: 0.45, ease: "power3.inOut" }, 5.4);
+      ft("#in-sheet", { filter: "none" }, { filter: "blur(10px)", duration: 0.22, ease: "power2.in" }, 5.4);
+      tl.to({}, { duration: 0.01 }, 5.88);
+      window.__timelines["intro"] = tl;
+    })();
+  </script>
+</template>

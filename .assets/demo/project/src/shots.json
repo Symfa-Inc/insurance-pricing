@@ -1,0 +1,137 @@
+{
+  "appStart": 5.3,
+  "framings": {
+    "F1": {
+      "cx": 584.5,
+      "cy": 416,
+      "s": 1.75,
+      "note": "form panel alone (others faded), centred; 542 px panel -> 949 px on screen"
+    },
+    "F2": {
+      "cx": 584.5,
+      "cy": 446.5,
+      "s": 1.6,
+      "note": "form panel + region menu (145-748), centred"
+    },
+    "CTX": {
+      "cx": 952.5,
+      "cy": 512,
+      "s": 1.02,
+      "note": "whole content (40-984), centred"
+    },
+    "F3": {
+      "cx": 1084.5,
+      "cy": 204,
+      "s": 2.3,
+      "note": "price card alone, centred"
+    },
+    "F4": {
+      "cx": 1084.5,
+      "cy": 782.25,
+      "s": 2.35,
+      "note": "feature impact card + tooltip room (581-983.5), centred"
+    },
+    "F5": {
+      "cx": 1084.5,
+      "cy": 450.25,
+      "s": 2.35,
+      "note": "interpretation card alone, centred"
+    },
+    "F6": {
+      "cx": 584.5,
+      "cy": 416,
+      "s": 1.75,
+      "note": "form panel alone: smoker and Estimate"
+    },
+    "FULL": {
+      "cx": 952.5,
+      "cy": 512,
+      "s": 1.0,
+      "note": "whole page, content centred (472 px free each side)"
+    },
+    "F4n": {
+      "cx": 1084.5,
+      "cy": 782.25,
+      "s": 2.35,
+      "note": "feature impact after the new estimate"
+    },
+    "CTXa": {
+      "cx": 952.5,
+      "cy": 363.5,
+      "s": 1.5,
+      "note": "header + form + pending card (40-687), content centred"
+    }
+  },
+  "callouts": [
+    {
+      "id": "ap-call-model",
+      "framing": "F3",
+      "anchor": "price-end",
+      "dx": 90,
+      "dy": 0,
+      "t": 18.75,
+      "hold": 1.75,
+      "text": "Estimated by an AutoGluon model"
+    },
+    {
+      "id": "ap-call-smoke",
+      "framing": "F4",
+      "anchor": "smoker-bar-pos",
+      "dx": -300,
+      "dy": -250,
+      "t": 27.15,
+      "hold": 1.7,
+      "text": "Smoking adds $8,602"
+    },
+    {
+      "id": "ap-call-color",
+      "framing": "F4",
+      "anchor": "region-bar-neg",
+      "dx": 200,
+      "dy": -45,
+      "t": 29.0,
+      "hold": 1.8,
+      "text": "Green raises it, red lowers it"
+    },
+    {
+      "id": "ap-call-ai",
+      "framing": "F5",
+      "anchor": "badge",
+      "dx": 130,
+      "dy": -120,
+      "t": 32.1,
+      "hold": 2.0,
+      "text": "Plain-English reasons from OpenAI"
+    },
+    {
+      "id": "ap-call-match",
+      "framing": "F5",
+      "anchor": "bullet-0",
+      "dx": 60,
+      "dy": -200,
+      "t": 34.5,
+      "hold": 2.1,
+      "text": "Matches the chart: +8602"
+    },
+    {
+      "id": "ap-call-drop",
+      "framing": "F3",
+      "anchor": "price-end",
+      "dx": 90,
+      "dy": 0,
+      "t": 47.8,
+      "hold": 2.0,
+      "text": "Down $22,698 a year"
+    },
+    {
+      "id": "ap-call-flip",
+      "framing": "F4n",
+      "anchor": "smoker-value-end",
+      "dx": -60,
+      "dy": -207,
+      "t": 51.4,
+      "hold": 2.0,
+      "text": "Was +$8,602, now \u2212$9,056"
+    }
+  ]
+}

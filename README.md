@@ -22,9 +22,7 @@ Full-stack ML application for estimating annual insurance charges with SHAP-base
 
 ## Preview
 
-<p align="center">
-<img src=".assets/insurance-pricing.png" width="80%" alt="Insurance Pricing Preview">
-</p>
+https://github.com/user-attachments/assets/5055536a-a40e-41fd-9619-6289dbbbb97f
 
 ## Features
 
