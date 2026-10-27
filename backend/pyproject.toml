@@ -7,6 +7,8 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    # Must match the version that serialized models/ag_insurance.
+    "autogluon.tabular==1.5.0",
     "fastapi>=0.128.0",
     "openai>=1.109.1",
     "pydantic>=2.12.5",
@@ -16,7 +18,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "autogluon.tabular>=1.5.0",
     "httpx>=0.28.1",
     "joblib>=1.4.0",
     "matplotlib>=3.9.0",

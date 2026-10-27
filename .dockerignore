@@ -1,0 +1,13 @@
+**
+!pyproject.toml
+!uv.lock
+!backend/
+!backend/pyproject.toml
+!backend/src/
+!backend/src/**
+!backend/models/
+!backend/models/**
+**/.env
+**/.env.*
+**/__pycache__/
+**/.DS_Store
