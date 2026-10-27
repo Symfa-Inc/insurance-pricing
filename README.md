@@ -22,7 +22,7 @@ Full-stack ML application for estimating annual insurance charges with SHAP-base
 
 ## Preview
 
-https://github.com/user-attachments/assets/41c5f88b-e238-4bf1-a142-a4874ea08ab5
+https://github.com/user-attachments/assets/5055536a-a40e-41fd-9619-6289dbbbb97f
 
 ## Features
 
