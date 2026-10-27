@@ -98,8 +98,8 @@ jobs:
         trap 'docker logs fix-insurance-pricing-backend; docker rm -f fix-insurance-pricing-backend fix-insurance-pricing-frontend' EXIT
         docker run -d --name fix-insurance-pricing-backend -p 3800:8000 -e CORS_ORIGINS=http://localhost:3300 insurance-pricing-backend
         docker run -d --name fix-insurance-pricing-frontend -p 3300:3000 -e API_URL=http://localhost:3800 insurance-pricing-frontend
-        curl --retry 30 --retry-connrefused --retry-delay 2 --fail http://localhost:3800/health
-        curl --retry 30 --retry-connrefused --retry-delay 2 --fail --output /dev/null http://localhost:3300
+        curl --retry 30 --retry-all-errors --retry-delay 2 --max-time 5 --fail http://localhost:3800/health
+        curl --retry 30 --retry-all-errors --retry-delay 2 --max-time 5 --fail --output /dev/null http://localhost:3300
         curl --fail --header 'Content-Type: application/json' --header 'Origin: http://localhost:3300' \
           --data '{"age":35,"sex":"female","bmi":27.5,"children":1,"smoker":"yes","region":"northeast"}' \
           --dump-header /tmp/prediction-headers.txt --output /tmp/prediction.json http://localhost:3800/predict
