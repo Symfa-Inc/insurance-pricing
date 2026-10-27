@@ -87,7 +87,32 @@ jobs:
       uses: actions/checkout@v6
 
     - name: Build backend image
-      run: docker build -t insurance-pricing-backend ./backend
+      run: docker build -t insurance-pricing-backend -f backend/Dockerfile .
 
     - name: Build frontend image
       run: docker build -t insurance-pricing-frontend ./frontend
+
+    - name: Verify container startup and prediction
+      shell: bash
+      run: |
+        trap 'docker logs fix-insurance-pricing-backend; docker rm -f fix-insurance-pricing-backend fix-insurance-pricing-frontend' EXIT
+        docker run -d --name fix-insurance-pricing-backend -p 3800:8000 -e CORS_ORIGINS=http://localhost:3300 insurance-pricing-backend
+        docker run -d --name fix-insurance-pricing-frontend -p 3300:3000 -e API_URL=http://localhost:3800 insurance-pricing-frontend
+        curl --retry 30 --retry-connrefused --retry-delay 2 --fail http://localhost:3800/health
+        curl --retry 30 --retry-connrefused --retry-delay 2 --fail --output /dev/null http://localhost:3300
+        curl --fail --header 'Content-Type: application/json' --header 'Origin: http://localhost:3300' \
+          --data '{"age":35,"sex":"female","bmi":27.5,"children":1,"smoker":"yes","region":"northeast"}' \
+          --dump-header /tmp/prediction-headers.txt --output /tmp/prediction.json http://localhost:3800/predict
+        python - <<'PY'
+        import json
+        from pathlib import Path
+
+        result = json.loads(Path("/tmp/prediction.json").read_text())
+        assert abs(result["charges"] - 20291.66) < 0.01, result
+        assert result["explainability_error"] is None, result
+        assert len(result["shap"]["contributions"]) == 6, result
+        assert result["interpretation"]["headline"], result
+        assert len(result["interpretation"]["bullets"]) == 5, result
+        assert "access-control-allow-origin: http://localhost:3300" in Path("/tmp/prediction-headers.txt").read_text().lower()
+        print(f"Prediction: ${result['charges']:,.2f}; 6 feature contributions; 5 interpretation bullets")
+        PY
